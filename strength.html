@@ -81,11 +81,10 @@
     0%   { transform: scale(1.5); opacity: 0; }
     100% { transform: scale(1);   opacity: 1; }
   }
-  /* 動画ラッパー：上40%・下20%クロップ（中間40%を表示） */
+  /* 動画ラッパー：上40%のみクロップ */
   .video-wrapper {
     width: 100%;
     max-width: 520px;
-    aspect-ratio: 40 / 9;  /* W × 9/40 = 22.5%W → 16:9動画の40%分の高さ */
     overflow: hidden;
     border-radius: 12px;
     isolation: isolate;
