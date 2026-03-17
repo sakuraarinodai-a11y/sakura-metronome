@@ -391,7 +391,9 @@ function cancelCountdown() {
 function startRepVideo() {
   const video = document.getElementById('bench-video');
   if (!video.duration) return;
-  const miniSetDuration = REPS_PER_MINI * (60 / TEMPO);   // 約23.6秒
+  // ビート1は即発火するため実再生時間は (REPS_PER_MINI - 1) インターバル分
+  // playbackRate = 動画尺 ÷ 12インターバル で13回目のビートと動画末尾が一致する
+  const miniSetDuration = (REPS_PER_MINI - 1) * (60 / TEMPO);  // 12 × 1.818 ≈ 21.8秒
   video.playbackRate = Math.min(video.duration / miniSetDuration, 15.9);
   video.currentTime  = 0;
   video.play().catch(() => {});
@@ -514,13 +516,15 @@ function onBeat() {
     }
   } else if (S.phase === 'rest') {
     S.restCount++;
-    playTone(440, 0.06, 0.2);
     if (S.restCount >= REST_BEATS) {
+      // 最終休憩拍：開始音のみ（休憩音と重ねない）
       S.miniSet++;
       S.phase     = 'rep';
       S.restCount = 0;
       startRepVideo();
-      playTone(1100, 0.1, 0.5);
+      playTone(1100, 0.12, 0.5);
+    } else {
+      playTone(440, 0.06, 0.2);
     }
   }
   updateDisplay();
