@@ -74,6 +74,7 @@
     max-width: 480px;
     height: auto;
     display: none;
+    mix-blend-mode: screen;   /* 黒背景を透過させる */
   }
   #bench-svg {
     width: 100%;
@@ -218,8 +219,9 @@
 <main>
   <!-- Bench Press Animation Panel -->
   <div class="bench-panel">
-    <!-- Video mode: shown when bench.webm is available -->
+    <!-- Video mode: shown when bench.mp4 or bench.webm is available -->
     <video id="bench-video" muted playsinline preload="auto">
+      <source src="bench.mp4"  type="video/mp4">
       <source src="bench.webm" type="video/webm">
     </video>
 
