@@ -82,7 +82,7 @@
     justify-content: center;
     gap: 6px;
     flex-shrink: 0;
-    width: 100px;
+    width: 120px;
   }
   #hr-value-display {
     font-size: 48px;
@@ -346,7 +346,7 @@
     <div class="hr-gauge-wrap">
       <div id="hr-value-display">--</div>
       <div class="hr-bpm-unit">bpm</div>
-      <svg id="hr-bar-svg" viewBox="0 0 80 360" width="80" height="360">
+      <svg id="hr-bar-svg" viewBox="0 0 108 360" width="108" height="360">
         <g id="hr-zone-bars"></g>
         <rect id="hr-indicator" x="2" y="338" width="76" height="4" fill="white" rx="2" opacity="0"/>
         <g id="hr-ticks"></g>
@@ -523,7 +523,7 @@ function onAge(v) {
   S.maxHR = 220 - S.age;
   document.getElementById('age-disp').textContent = S.age;
   document.getElementById('mhr-disp').textContent = `最大 ${S.maxHR} bpm`;
-  buildHRBar();
+  buildHRBar(S.maxHR);
   if (S.hr > 0) updateHRBar(S.hr, S.maxHR);
   try { localStorage.setItem('sakura_step_age', S.age); } catch (_) {}
 }
@@ -534,7 +534,7 @@ const BAR_HEIGHT = 320;
 const BAR_LEFT   = 8;
 const BAR_W      = 64;
 
-function buildHRBar() {
+function buildHRBar(maxHR) {
   const gZones = document.getElementById('hr-zone-bars');
   const gTicks = document.getElementById('hr-ticks');
   gZones.innerHTML = '';
@@ -556,17 +556,33 @@ function buildHRBar() {
     gZones.appendChild(rect);
   });
 
-  // 境界目盛り線
-  [0.50, 0.60, 0.70, 0.85].forEach(t => {
-    const y = BAR_TOP + BAR_HEIGHT * (1 - t);
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', BAR_LEFT - 3);
-    line.setAttribute('y1', y);
-    line.setAttribute('x2', BAR_LEFT + BAR_W + 3);
-    line.setAttribute('y2', y);
-    line.setAttribute('stroke', '#3a3a3a');
-    line.setAttribute('stroke-width', '1');
-    gTicks.appendChild(line);
+  // 境界目盛り線＋BPMラベル（年齢連動）
+  const LX = BAR_LEFT + BAR_W + 4; // ラベルのx位置
+  [0.50, 0.60, 0.70, 0.85, 1.00].forEach(t => {
+    const y   = BAR_TOP + BAR_HEIGHT * (1 - t);
+    const bpm = Math.round(maxHR * t);
+
+    if (t < 1.00) {
+      const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+      line.setAttribute('x1', BAR_LEFT - 3);
+      line.setAttribute('y1', y);
+      line.setAttribute('x2', BAR_LEFT + BAR_W + 3);
+      line.setAttribute('y2', y);
+      line.setAttribute('stroke', '#3a3a3a');
+      line.setAttribute('stroke-width', '1');
+      gTicks.appendChild(line);
+    }
+
+    // BPM値ラベル
+    const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    txt.setAttribute('x', LX);
+    txt.setAttribute('y', y + 4);
+    txt.setAttribute('font-size', '10');
+    txt.setAttribute('fill', '#555');
+    txt.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
+    txt.setAttribute('font-variant-numeric', 'tabular-nums');
+    txt.textContent = bpm;
+    gTicks.appendChild(txt);
   });
 }
 
