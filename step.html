@@ -63,19 +63,78 @@
     overflow: hidden;
   }
 
-  /* --- Tachometer panel --- */
+  /* --- Left panel --- */
   .tach-panel {
+    display: flex;
+    align-items: stretch;
+    border-right: 1px solid #1a1a1a;
+    background: #0b0b0b;
+    padding: 12px 8px 12px 12px;
+    gap: 8px;
+    overflow: hidden;
+  }
+
+  /* HR vertical bar */
+  .hr-gauge-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    flex-shrink: 0;
+    width: 100px;
+  }
+  #hr-value-display {
+    font-size: 48px;
+    font-weight: 900;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    text-align: center;
+    min-width: 80px;
+  }
+  .hr-bpm-unit {
+    font-size: 12px;
+    color: #555;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-top: -4px;
+  }
+  #hr-bar-svg { display: block; }
+  #hr-zone-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #666;
+    text-align: center;
+    min-height: 18px;
+    letter-spacing: 0.04em;
+  }
+
+  /* Metronome */
+  .metro-wrap {
+    flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid #1a1a1a;
-    background: #0b0b0b;
-    padding: 12px;
+    overflow: hidden;
+    min-width: 0;
   }
-  #tach-svg {
+  #metro-svg {
     width: 100%;
-    max-width: 560px;
-    height: auto;
+    height: 100%;
+    max-width: 460px;
+    display: block;
+  }
+
+  /* Pendulum animation */
+  #pendulum-group {
+    transform-box: fill-box;
+    transform-origin: 50% 0%;
+    animation: pendulum-swing 0.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
+  }
+  @keyframes pendulum-swing {
+    0%   { transform: rotate(-26deg); }
+    100% { transform: rotate(26deg); }
   }
 
   /* --- Right panel --- */
@@ -112,9 +171,7 @@
     transition: opacity 0.04s;
     letter-spacing: -4px;
   }
-  #bpm-value.flash {
-    color: #e8c4b8;
-  }
+  #bpm-value.flash { color: #e8c4b8; }
   #bpm-label {
     font-size: 20px;
     color: #555;
@@ -137,9 +194,7 @@
     border: 2px solid #333;
     transition: background 0.08s, box-shadow 0.08s;
   }
-  .beat-dot.beat-dot--accent {
-    border-color: #e8c4b8;
-  }
+  .beat-dot.beat-dot--accent { border-color: #e8c4b8; }
   .beat-dot.beat-dot--accent.active {
     background: #e8c4b8;
     box-shadow: 0 0 14px #e8c4b855;
@@ -168,7 +223,6 @@
     background: #1e1e1e;
     border-radius: 5px;
     overflow: hidden;
-    position: relative;
   }
   #progress-bar-fill {
     height: 100%;
@@ -190,21 +244,9 @@
   #done-screen.visible { display: flex; }
   .step-panel-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; width: 100%; }
   .step-panel-inner.hidden { display: none; }
-  .done-title {
-    font-size: 36px;
-    font-weight: 800;
-    color: #22C55E;
-    letter-spacing: 0.05em;
-  }
-  .done-stat {
-    font-size: 18px;
-    color: #aaa;
-  }
-  .done-stat span {
-    color: #fff;
-    font-weight: 700;
-    font-size: 22px;
-  }
+  .done-title { font-size: 36px; font-weight: 800; color: #22C55E; letter-spacing: 0.05em; }
+  .done-stat { font-size: 18px; color: #aaa; }
+  .done-stat span { color: #fff; font-weight: 700; font-size: 22px; }
   #btn-retry {
     background: #1a1a1a;
     border: 1px solid #333;
@@ -241,20 +283,9 @@
     white-space: nowrap;
   }
   .footer-btn:hover { background: #202020; }
-  .footer-btn.selected {
-    background: #1a2e3a;
-    border-color: #0284C7;
-    color: #38BDF8;
-  }
-  .footer-btn.ok {
-    background: #0f2a1a;
-    border-color: #16A34A;
-    color: #4ADE80;
-  }
-  .footer-btn:disabled {
-    opacity: 0.38;
-    cursor: not-allowed;
-  }
+  .footer-btn.selected { background: #1a2e3a; border-color: #0284C7; color: #38BDF8; }
+  .footer-btn.ok { background: #0f2a1a; border-color: #16A34A; color: #4ADE80; }
+  .footer-btn:disabled { opacity: 0.38; cursor: not-allowed; }
   .footer-spacer { flex: 1; }
   #btn-start {
     background: #14532d;
@@ -264,11 +295,7 @@
     padding: 10px 34px;
   }
   #btn-start:hover:not(:disabled) { background: #166534; }
-  #btn-start.stop {
-    background: #4a0e0e;
-    border-color: #DC2626;
-    color: #F87171;
-  }
+  #btn-start.stop { background: #4a0e0e; border-color: #DC2626; color: #F87171; }
   #btn-start.stop:hover { background: #5a1010; }
 </style>
 </head>
@@ -285,34 +312,74 @@
 
 <!-- MAIN -->
 <main>
-  <!-- Tachometer -->
+  <!-- Left Panel -->
   <div class="tach-panel">
-    <svg id="tach-svg" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <filter id="needle-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-      </defs>
-      <g id="g-arcs"></g>
-      <g id="g-ticks"></g>
-      <g id="g-labels"></g>
-      <g id="needle-group" filter="url(#needle-glow)" transform="translate(280,308) rotate(-120)">
-        <polygon id="needle-body" points="-4.5,14 4.5,14 2,-168 -2,-168" fill="#d8d8d8"/>
-        <polygon id="needle-tip"  points="-2,-163 2,-163 0.8,-208 -0.8,-208" fill="#EF4444"/>
-      </g>
-      <circle cx="280" cy="308" r="86" fill="#0b0b0b" stroke="#1e1e1e" stroke-width="1.5"/>
-      <circle cx="280" cy="308" r="22" fill="#161616" stroke="#3a3a3a" stroke-width="2"/>
-      <circle cx="280" cy="308" r="10" fill="#e8c4b8"/>
-      <text id="t-hr" x="280" y="287" text-anchor="middle" font-size="74" font-weight="900" fill="#fff" font-family="'Helvetica Neue',Arial,sans-serif">--</text>
-      <text id="t-unit" x="280" y="307" text-anchor="middle" font-size="16" fill="#555" font-family="'Helvetica Neue',Arial,sans-serif">bpm</text>
-      <text id="t-zone" x="280" y="344" text-anchor="middle" font-size="15" fill="#555" font-family="'Helvetica Neue',Arial,sans-serif"></text>
-    </svg>
+
+    <!-- HR vertical bar -->
+    <div class="hr-gauge-wrap">
+      <div id="hr-value-display">--</div>
+      <div class="hr-bpm-unit">bpm</div>
+      <svg id="hr-bar-svg" viewBox="0 0 80 360" width="80" height="360">
+        <g id="hr-zone-bars"></g>
+        <rect id="hr-indicator" x="2" y="338" width="76" height="4" fill="white" rx="2" opacity="0"/>
+        <g id="hr-ticks"></g>
+      </svg>
+      <div id="hr-zone-label">---</div>
+    </div>
+
+    <!-- Metronome SVG -->
+    <div class="metro-wrap">
+      <svg id="metro-svg" viewBox="0 0 380 480" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+        <!-- 台座 -->
+        <polygon points="60,465 320,465 345,390 35,390" fill="#141414" stroke="#282828" stroke-width="1.5"/>
+        <!-- 台座内飾り -->
+        <line x1="80" y1="412" x2="300" y2="412" stroke="#222" stroke-width="1"/>
+        <text x="190" y="452" text-anchor="middle" font-size="12" fill="#2a2a2a"
+              font-family="'Helvetica Neue',Arial,sans-serif" letter-spacing="4" font-weight="600">SAKURA</text>
+        <!-- 本体（台形） -->
+        <polygon points="100,55 280,55 340,390 40,390" fill="#181818" stroke="#262626" stroke-width="1.5"/>
+        <!-- 本体内の縦線装飾 -->
+        <line x1="190" y1="70" x2="190" y2="380" stroke="#1e1e1e" stroke-width="1.5"/>
+        <!-- 目盛り（左） -->
+        <line x1="98" y1="120" x2="120" y2="126" stroke="#2a2a2a" stroke-width="1.2"/>
+        <line x1="88"  y1="165" x2="114" y2="168" stroke="#2a2a2a" stroke-width="1.2"/>
+        <line x1="80"  y1="210" x2="110" y2="210" stroke="#333"    stroke-width="1.5"/>
+        <line x1="80"  y1="255" x2="110" y2="252" stroke="#2a2a2a" stroke-width="1.2"/>
+        <line x1="82"  y1="300" x2="112" y2="294" stroke="#2a2a2a" stroke-width="1.2"/>
+        <!-- 目盛り（右） -->
+        <line x1="282" y1="120" x2="260" y2="126" stroke="#2a2a2a" stroke-width="1.2"/>
+        <line x1="292" y1="165" x2="266" y2="168" stroke="#2a2a2a" stroke-width="1.2"/>
+        <line x1="300" y1="210" x2="270" y2="210" stroke="#333"    stroke-width="1.5"/>
+        <line x1="298" y1="255" x2="270" y2="252" stroke="#2a2a2a" stroke-width="1.2"/>
+        <line x1="298" y1="300" x2="268" y2="294" stroke="#2a2a2a" stroke-width="1.2"/>
+        <!-- 支点ピン -->
+        <circle cx="190" cy="58" r="10" fill="#222" stroke="#3a3a3a" stroke-width="2"/>
+        <circle cx="190" cy="58" r="4"  fill="#444"/>
+        <!-- 振り子（支点(190,58)に平行移動してからrotate） -->
+        <g transform="translate(190,58)">
+          <g id="pendulum-group">
+            <!-- 棒 -->
+            <line x1="0" y1="0" x2="0" y2="320" stroke="#c0c0c0" stroke-width="5" stroke-linecap="round"/>
+            <!-- 棒の光沢 -->
+            <line x1="-1" y1="10" x2="-1" y2="310" stroke="#e0e0e0" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
+            <!-- 調整重り（スライダー） -->
+            <rect x="-20" y="170" width="40" height="26" rx="4" fill="#1e1e1e" stroke="#484848" stroke-width="1.5"/>
+            <line x1="-14" y1="183" x2="14" y2="183" stroke="#555" stroke-width="1.5"/>
+            <!-- 先端の錘 -->
+            <circle cx="0" cy="304" r="34" fill="#2a2a2a" stroke="#404040" stroke-width="2"/>
+            <circle cx="0" cy="304" r="26" fill="#1a1a1a"/>
+            <!-- 錘のハイライト -->
+            <circle cx="-8" cy="296" r="8" fill="#e8c4b8" opacity="0.9"/>
+            <circle cx="-8" cy="296" r="4" fill="#f4d8ce" opacity="0.8"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
   </div>
 
-  <!-- Step Panel -->
+  <!-- Right Panel -->
   <div class="step-panel">
-    <!-- Normal view -->
     <div class="step-panel-inner" id="main-panel">
       <div id="preset-name">プリセットを選択してください</div>
 
@@ -335,7 +402,6 @@
       </div>
     </div>
 
-    <!-- Done screen -->
     <div id="done-screen">
       <div class="done-title">完了！</div>
       <div class="done-stat">最終 BPM: <span id="done-bpm">--</span></div>
@@ -363,9 +429,6 @@ const ZONES = [
   { min: 0.70, max: 0.85, color: '#D97706', label: 'トレーニング' },
   { min: 0.85, max: 1.00, color: '#DC2626', label: 'アスリート' },
 ];
-const CX = 280, CY = 308, R_IN = 210, R_OUT = 250;
-const START_DEG = -120, SPAN_DEG = 240;
-const PIVOT_BPM = 100, PIVOT_RATIO = 0.25;
 
 const PRESETS = [
   { name: 'ウォーキング1', start: 75, end: 105 },
@@ -414,137 +477,79 @@ function playTone(freq, dur, vol = 0.4, type = 'sine') {
   } catch (_) {}
 }
 
-// ===== TACHOMETER =====
-function degToRad(d) { return d * Math.PI / 180; }
+// ===== HR BAR GAUGE =====
+const BAR_TOP    = 10;
+const BAR_HEIGHT = 320;
+const BAR_LEFT   = 8;
+const BAR_W      = 64;
 
-function hrToAngle(hr, maxHR) {
-  if (hr <= PIVOT_BPM) {
-    return START_DEG + (hr / PIVOT_BPM) * PIVOT_RATIO * SPAN_DEG;
-  }
-  const clamped = Math.min(hr, maxHR);
-  return START_DEG + PIVOT_RATIO * SPAN_DEG
-    + ((clamped - PIVOT_BPM) / Math.max(1, maxHR - PIVOT_BPM)) * (1 - PIVOT_RATIO) * SPAN_DEG;
-}
-
-function ratioToAngle(ratio) {
-  return START_DEG + ratio * SPAN_DEG;
-}
-
-function polarToXY(cx, cy, r, deg) {
-  const rad = degToRad(deg);
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-}
-
-function arcPath(cx, cy, rIn, rOut, startDeg, endDeg) {
-  const s1 = polarToXY(cx, cy, rIn, startDeg);
-  const s2 = polarToXY(cx, cy, rOut, startDeg);
-  const e1 = polarToXY(cx, cy, rIn, endDeg);
-  const e2 = polarToXY(cx, cy, rOut, endDeg);
-  const large = (endDeg - startDeg) > 180 ? 1 : 0;
-  return [
-    `M ${s2.x} ${s2.y}`,
-    `A ${rOut} ${rOut} 0 ${large} 1 ${e2.x} ${e2.y}`,
-    `L ${e1.x} ${e1.y}`,
-    `A ${rIn} ${rIn} 0 ${large} 0 ${s1.x} ${s1.y}`,
-    'Z'
-  ].join(' ');
-}
-
-function drawTach(maxHR) {
-  const gArcs = document.getElementById('g-arcs');
-  const gTicks = document.getElementById('g-ticks');
-  const gLabels = document.getElementById('g-labels');
-  gArcs.innerHTML = '';
+function buildHRBar() {
+  const gZones = document.getElementById('hr-zone-bars');
+  const gTicks = document.getElementById('hr-ticks');
+  gZones.innerHTML = '';
   gTicks.innerHTML = '';
-  gLabels.innerHTML = '';
 
-  // Draw zone arcs
+  // ゾーン背景（下が低心拍・上が高心拍）
   ZONES.forEach(zone => {
-    const startAngle = ratioToAngle(zone.min);
-    const endAngle   = ratioToAngle(zone.max);
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', arcPath(CX, CY, R_IN, R_OUT, startAngle, endAngle));
-    path.setAttribute('fill', zone.color);
-    path.setAttribute('opacity', '0.85');
-    path.setAttribute('id', 'arc-' + zone.label);
-    gArcs.appendChild(path);
+    const yTop = BAR_TOP + BAR_HEIGHT * (1 - zone.max);
+    const h    = BAR_HEIGHT * (zone.max - zone.min);
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('x', BAR_LEFT);
+    rect.setAttribute('y', yTop);
+    rect.setAttribute('width', BAR_W);
+    rect.setAttribute('height', Math.max(1, h));
+    rect.setAttribute('rx', '3');
+    rect.setAttribute('fill', zone.color);
+    rect.setAttribute('opacity', '0.5');
+    rect.setAttribute('id', 'zone-bar-' + zone.label);
+    gZones.appendChild(rect);
   });
 
-  // Draw tick marks
-  const tickBPMs = [];
-  for (let bpm = 0; bpm <= maxHR; bpm += 10) tickBPMs.push(bpm);
-
-  tickBPMs.forEach(bpm => {
-    const angle = hrToAngle(bpm, maxHR);
-    const isMajor = bpm % 20 === 0;
-    const rTickIn  = isMajor ? R_IN - 14 : R_IN - 7;
-    const rTickOut = R_IN - 2;
-    const p1 = polarToXY(CX, CY, rTickIn, angle);
-    const p2 = polarToXY(CX, CY, rTickOut, angle);
+  // 境界目盛り線
+  [0.50, 0.60, 0.70, 0.85].forEach(t => {
+    const y = BAR_TOP + BAR_HEIGHT * (1 - t);
     const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', p1.x); line.setAttribute('y1', p1.y);
-    line.setAttribute('x2', p2.x); line.setAttribute('y2', p2.y);
-    line.setAttribute('stroke', isMajor ? '#aaa' : '#555');
-    line.setAttribute('stroke-width', isMajor ? '2' : '1');
+    line.setAttribute('x1', BAR_LEFT - 3);
+    line.setAttribute('y1', y);
+    line.setAttribute('x2', BAR_LEFT + BAR_W + 3);
+    line.setAttribute('y2', y);
+    line.setAttribute('stroke', '#3a3a3a');
+    line.setAttribute('stroke-width', '1');
     gTicks.appendChild(line);
-
-    if (isMajor) {
-      const rLabel = R_IN - 28;
-      const lp = polarToXY(CX, CY, rLabel, angle);
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', lp.x);
-      text.setAttribute('y', lp.y);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'central');
-      text.setAttribute('font-size', '13');
-      text.setAttribute('fill', '#666');
-      text.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
-      text.textContent = bpm;
-      gLabels.appendChild(text);
-    }
   });
+}
 
-  // Zone labels on arc
+function updateHRBar(hr, maxHR) {
+  const ratio = Math.min(1, Math.max(0, hr / maxHR));
+  const y = BAR_TOP + BAR_HEIGHT * (1 - ratio);
+
+  const indicator = document.getElementById('hr-indicator');
+  indicator.setAttribute('y', y - 2);
+  indicator.setAttribute('opacity', '1');
+
+  let currentZone = ZONES[0];
   ZONES.forEach(zone => {
-    if (zone.label === '安静') return;
-    const midRatio = (zone.min + zone.max) / 2;
-    const midAngle = ratioToAngle(midRatio);
-    const rLabel = (R_IN + R_OUT) / 2;
-    const lp = polarToXY(CX, CY, rLabel, midAngle);
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', lp.x);
-    text.setAttribute('y', lp.y);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('dominant-baseline', 'central');
-    text.setAttribute('font-size', '11');
-    text.setAttribute('fill', '#fff');
-    text.setAttribute('font-weight', '600');
-    text.setAttribute('transform', `rotate(${midAngle + 90}, ${lp.x}, ${lp.y})`);
-    text.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
-    text.textContent = zone.label;
-    gLabels.appendChild(text);
-  });
-}
-
-function moveNeedle(hr, maxHR) {
-  const angle = hrToAngle(hr, maxHR);
-  const group = document.getElementById('needle-group');
-  group.setAttribute('transform', `translate(${CX},${CY}) rotate(${angle})`);
-}
-
-function highlightZone(hr, maxHR) {
-  const ratio = hr / maxHR;
-  let currentZone = ZONES[0].label;
-  ZONES.forEach(z => {
-    const el = document.getElementById('arc-' + z.label);
-    if (ratio >= z.min && ratio < z.max) {
-      currentZone = z.label;
+    const el = document.getElementById('zone-bar-' + zone.label);
+    if (ratio >= zone.min && ratio < zone.max) {
+      currentZone = zone;
       if (el) el.setAttribute('opacity', '1');
     } else {
-      if (el) el.setAttribute('opacity', '0.45');
+      if (el) el.setAttribute('opacity', '0.25');
     }
   });
-  return currentZone;
+
+  document.getElementById('hr-value-display').textContent = hr;
+  const zLabel = document.getElementById('hr-zone-label');
+  zLabel.textContent = currentZone.label;
+  zLabel.style.color = currentZone.color;
+}
+
+// ===== METRONOME ANIMATION =====
+function updatePendulumSpeed(bpm) {
+  if (bpm <= 0) return;
+  // alternateなので片道=1ビート=60/bpm秒
+  const halfPeriod = 60 / bpm;
+  document.getElementById('pendulum-group').style.animationDuration = halfPeriod + 's';
 }
 
 // ===== BEAT DOTS =====
@@ -563,11 +568,7 @@ function updateBeatDots(beatIndex) {
   for (let i = 0; i < BEATS_PER_LEVEL; i++) {
     const dot = document.getElementById('dot-' + i);
     if (!dot) continue;
-    if (i < beatIndex) {
-      dot.classList.add('active');
-    } else {
-      dot.classList.remove('active');
-    }
+    dot.classList.toggle('active', i < beatIndex);
   }
 }
 
@@ -594,31 +595,30 @@ function flashBPM() {
   _flashTimer = setTimeout(() => el.classList.remove('flash'), 80);
 }
 
-// ===== METRONOME =====
+// ===== METRONOME ENGINE =====
 function onBeat() {
   S.beatInLevel++;
   S.totalBeats++;
 
-  const isAccent = (S.beatInLevel === 1);
+  const isAccent  = (S.beatInLevel === 1);
   const isLevelUp = (S.beatInLevel > BEATS_PER_LEVEL);
 
   if (isLevelUp) {
-    // BPM level up
     S.bpm++;
     S.beatInLevel = 1;
     const preset = PRESETS[S.selectedPreset];
 
     if (S.bpm > preset.end) {
-      // Done
       stopMetronome(true);
       return;
     }
 
-    playTone(660, 0.18, 0.45, 'square'); // level up sound
+    playTone(660, 0.18, 0.45, 'square');
     flashBPM();
     document.getElementById('bpm-value').textContent = S.bpm;
     updateProgress();
     updateBeatDots(1);
+    updatePendulumSpeed(S.bpm);
   } else {
     if (isAccent) {
       playTone(1200, 0.07, 0.5, 'sine');
@@ -655,6 +655,7 @@ function startMetronome() {
   document.getElementById('btn-start').classList.add('stop');
   updateBeatDots(0);
   updateProgress();
+  updatePendulumSpeed(S.bpm);
   tick();
 }
 
@@ -730,31 +731,25 @@ function onHR(e) {
   const hr = (fl & 0x01) ? v.getUint16(1, true) : v.getUint8(1);
   S.hr = hr;
   if (hr > S.peakHR) S.peakHR = hr;
-  document.getElementById('t-hr').textContent = hr;
-  moveNeedle(hr, S.maxHR);
-  const zName = highlightZone(hr, S.maxHR);
-  const zObj = ZONES.find(z => z.label === zName);
-  document.getElementById('t-zone').textContent = zName;
-  document.getElementById('t-zone').setAttribute('fill', zObj?.color || '#666');
+  updateHRBar(hr, S.maxHR);
 }
 
 // ===== CLOCK =====
 function updateClock() {
   const now = new Date();
-  const h = String(now.getHours()).padStart(2, '0');
-  const m = String(now.getMinutes()).padStart(2, '0');
+  const h   = String(now.getHours()).padStart(2, '0');
+  const m   = String(now.getMinutes()).padStart(2, '0');
   const sec = String(now.getSeconds()).padStart(2, '0');
   document.getElementById('clock').textContent = `${h}:${m}:${sec}`;
 }
 
 // ===== INIT =====
 function init() {
-  drawTach(S.maxHR);
+  buildHRBar();
   buildBeatDots();
   updateClock();
   setInterval(updateClock, 1000);
 
-  // Preset buttons
   PRESETS.forEach((preset, idx) => {
     const btn = document.getElementById('btn-preset-' + idx);
     btn.addEventListener('click', () => {
@@ -769,17 +764,14 @@ function init() {
       document.getElementById('btn-start').disabled = false;
       updateBeatDots(0);
       hideDoneScreen();
-
-      // Update selected state
       document.querySelectorAll('[id^="btn-preset-"]').forEach((b, i) => {
         b.classList.toggle('selected', i === idx);
       });
     });
   });
 
-  // Start/Stop button
   document.getElementById('btn-start').addEventListener('click', () => {
-    getAudioCtx(); // unlock audio on user gesture
+    getAudioCtx();
     if (S.running) {
       stopMetronome(false);
     } else {
@@ -787,10 +779,8 @@ function init() {
     }
   });
 
-  // Bluetooth button
   document.getElementById('btn-bt').addEventListener('click', connectBT);
 
-  // Done screen retry
   document.getElementById('btn-retry').addEventListener('click', () => {
     hideDoneScreen();
     document.getElementById('bpm-value').textContent = PRESETS[S.selectedPreset].start;
@@ -798,7 +788,6 @@ function init() {
     updateProgress();
   });
 
-  // Fullscreen button
   document.getElementById('btn-fullscreen').addEventListener('click', () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
