@@ -282,18 +282,21 @@
     #bench-volume { font-size: clamp(20px, 6vw, 38px); }
     #bench-phase-label { font-size: clamp(18px, 5vw, 34px); }
     .metro-row { gap: 14px; }
-    #btn-start { font-size: 16px; padding: 12px 22px; }
+    #btn-start { width: 64px; height: 64px; font-size: 26px; }
   }
 
   #btn-start {
-    background: #14532d; border: 1px solid #16A34A; color: #4ADE80;
-    font-size: 18px; padding: 14px 28px; border-radius: 12px;
-    cursor: pointer; font-family: inherit; font-weight: 700;
-    transition: background 0.15s;
+    width: 80px; height: 80px; border-radius: 50%;
+    background: #14532d; border: 2px solid #16A34A; color: #4ADE80;
+    font-size: 34px; line-height: 1;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, box-shadow 0.15s;
+    box-shadow: 0 0 24px rgba(34,197,94,0.25);
     flex-shrink: 0;
   }
-  #btn-start:hover { background: #166534; }
-  #btn-start.stop { background: #4a0e0e; border-color: #DC2626; color: #F87171; }
+  #btn-start:hover { background: #166534; box-shadow: 0 0 36px rgba(34,197,94,0.4); }
+  #btn-start.stop { background: #4a0e0e; border-color: #DC2626; color: #F87171; box-shadow: 0 0 24px rgba(239,68,68,0.25); }
   #btn-start.stop:hover { background: #5a1010; }
 </style>
 </head>
@@ -312,6 +315,9 @@
 <main>
   <!-- Bench Press Video Panel -->
   <div class="bench-panel">
+    <!-- 開始ボタン（総ボリュームの上） -->
+    <button id="btn-start">▶</button>
+
     <!-- 総ボリューム（動画上） -->
     <div id="bench-volume">
       <span class="vol-label">総ボリューム</span>
@@ -433,7 +439,6 @@
       <ellipse cx="-30" cy="213" rx="14" ry="4" fill="#080c10" stroke="#1a2a3a" stroke-width="1"/>
       <ellipse cx="30"  cy="213" rx="14" ry="4" fill="#080c10" stroke="#1a2a3a" stroke-width="1"/>
     </svg>
-    <button id="btn-start">開始</button>
     </div><!-- /metro-row -->
 
     <div class="strength-card" id="strength-card">
@@ -565,7 +570,7 @@ function hideCountdown() {
 function startCountdown() {
   _cdVal = COUNTDOWN_FROM;
   S.phase = 'countdown';
-  document.getElementById('btn-start').textContent = '停止';
+  document.getElementById('btn-start').textContent = '■';
   document.getElementById('btn-start').classList.add('stop');
   document.getElementById('bench-phase-label').textContent = '';
   updateMiniSetDots();
@@ -854,7 +859,7 @@ function stopTraining() {
   S.phase = 'idle';
 
   const btn = document.getElementById('btn-start');
-  btn.textContent = '開始';
+  btn.textContent = '▶';
   btn.classList.remove('stop');
   updateDisplay();
 }
