@@ -81,13 +81,36 @@
     0%   { transform: scale(1.5); opacity: 0; }
     100% { transform: scale(1);   opacity: 1; }
   }
-  #bench-video {
+  /* 動画ラッパー：上30%をクロップ */
+  .video-wrapper {
     width: 100%;
     max-width: 520px;
-    height: auto;
+    overflow: hidden;
     border-radius: 12px;
+  }
+  #bench-video {
+    width: 100%;
+    display: block;
+    margin-top: -16.875%;  /* 上30%を隠す (30% × 9/16 = 16.875%) */
     mix-blend-mode: screen;
   }
+
+  /* 総ボリューム（動画上・大表示） */
+  #bench-volume {
+    font-size: clamp(28px, 4vw, 48px);
+    font-weight: 900;
+    color: #e8c4b8;
+    letter-spacing: 0.02em;
+    text-align: center;
+  }
+  #bench-volume .vol-label {
+    font-size: 0.45em;
+    color: #666;
+    font-weight: 500;
+    display: block;
+    margin-bottom: 2px;
+  }
+
   #bench-phase-label {
     font-size: clamp(24px, 3vw, 40px);
     font-weight: 900;
@@ -175,16 +198,40 @@
   }
   #interval-val { font-size: 15px; color: #aaa; font-variant-numeric: tabular-nums; min-width: 50px; text-align: right; }
 
-  /* Weight */
+  /* Weight (カード内・大表示) */
+  .weight-control {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    width: 100%;
+    padding: 10px 0 4px;
+    border-bottom: 1px solid #222;
+  }
+  .weight-label {
+    font-size: 14px;
+    color: #666;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+  }
   .weight-btn {
-    background: #1a1a1a; border: 1px solid #2a2a2a; color: #aaa;
-    font-size: 18px; width: 36px; height: 36px; border-radius: 6px;
+    background: #1e1e1e; border: 1px solid #333; color: #bbb;
+    font-size: 22px; width: 48px; height: 48px; border-radius: 10px;
     cursor: pointer; font-family: inherit; font-weight: 700;
     display: flex; align-items: center; justify-content: center;
-    transition: background 0.15s; flex-shrink: 0;
+    transition: background 0.15s, border-color 0.15s; flex-shrink: 0;
   }
-  .weight-btn:hover { background: #252525; }
-  #weight-display { font-size: 18px; font-weight: 700; color: #fff; min-width: 60px; text-align: center; font-variant-numeric: tabular-nums; }
+  .weight-btn:hover { background: #2a2a2a; border-color: #e8c4b8; color: #e8c4b8; }
+  #weight-display {
+    font-size: clamp(42px, 6vw, 64px);
+    font-weight: 900;
+    color: #e8c4b8;
+    min-width: 120px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
 
   #btn-start {
     background: #14532d; border: 1px solid #16A34A; color: #4ADE80;
@@ -212,10 +259,20 @@
 <main>
   <!-- Bench Press Video Panel -->
   <div class="bench-panel">
-    <video id="bench-video" muted playsinline preload="auto">
-      <source src="bench.mp4"  type="video/mp4">
-      <source src="bench.webm" type="video/webm">
-    </video>
+    <!-- 総ボリューム（動画上） -->
+    <div id="bench-volume">
+      <span class="vol-label">総ボリューム</span>
+      <span id="bench-volume-val">0 kg</span>
+    </div>
+
+    <!-- 動画（上30%クロップ） -->
+    <div class="video-wrapper">
+      <video id="bench-video" muted playsinline preload="auto">
+        <source src="bench.mp4"  type="video/mp4">
+        <source src="bench.webm" type="video/webm">
+      </video>
+    </div>
+
     <div id="bench-phase-label" class="idle">スタート待ち</div>
 
     <!-- Countdown overlay -->
@@ -228,10 +285,17 @@
   <div class="strength-panel">
     <div class="strength-card" id="strength-card">
       <div class="mini-set-dots" id="mini-set-dots"></div>
+
+      <!-- 重量設定（カウンター上） -->
+      <div class="weight-control">
+        <button class="weight-btn" id="btn-weight-down">◀</button>
+        <div id="weight-display">20 kg</div>
+        <button class="weight-btn" id="btn-weight-up">▶</button>
+      </div>
+
       <div id="main-number">--</div>
       <div id="main-denom"></div>
       <div id="set-info">1セット目</div>
-      <div id="total-volume">総ボリューム: <span id="volume-val">0 kg</span></div>
     </div>
   </div>
 </main>
@@ -244,10 +308,6 @@
     <span id="interval-val">60秒</span>
   </div>
   <div class="footer-row">
-    <button class="weight-btn" id="btn-weight-down">◀</button>
-    <div id="weight-display">20 kg</div>
-    <button class="weight-btn" id="btn-weight-up">▶</button>
-    <div class="footer-spacer"></div>
     <button id="btn-start">開始</button>
   </div>
 </footer>
@@ -452,7 +512,6 @@ function updateDisplay() {
   const mainNumber = document.getElementById('main-number');
   const mainDenom  = document.getElementById('main-denom');
   const setInfo    = document.getElementById('set-info');
-  const volumeVal  = document.getElementById('volume-val');
   const benchLabel = document.getElementById('bench-phase-label');
 
   card.classList.remove('phase-rep', 'phase-rest', 'phase-interval');
@@ -490,7 +549,8 @@ function updateDisplay() {
   }
 
   setInfo.textContent   = S.setNum + 'セット目';
-  volumeVal.textContent = (S.weight * S.totalReps).toLocaleString() + ' kg';
+  const vol = (S.weight * S.totalReps).toLocaleString() + ' kg';
+  document.getElementById('bench-volume-val').textContent = vol;
   updateMiniSetDots();
 }
 
