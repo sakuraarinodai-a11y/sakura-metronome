@@ -55,6 +55,32 @@
     gap: 16px;
     position: relative;
   }
+
+  /* Countdown overlay */
+  #countdown-overlay {
+    position: absolute;
+    inset: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.6);
+    z-index: 10;
+  }
+  #countdown-overlay.show { display: flex; }
+  #countdown-num {
+    font-size: clamp(140px, 22vw, 220px);
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    color: #fff;
+    line-height: 1;
+    text-shadow: 0 0 60px rgba(255,255,255,0.4);
+    animation: cnt-pop 0.15s ease-out;
+  }
+  #countdown-num.buzz { color: #EF4444; text-shadow: 0 0 80px rgba(239,68,68,0.7); }
+  @keyframes cnt-pop {
+    0%   { transform: scale(1.5); opacity: 0; }
+    100% { transform: scale(1);   opacity: 1; }
+  }
   #bench-video {
     width: 100%;
     max-width: 520px;
@@ -191,6 +217,11 @@
       <source src="bench.webm" type="video/webm">
     </video>
     <div id="bench-phase-label" class="idle">スタート待ち</div>
+
+    <!-- Countdown overlay -->
+    <div id="countdown-overlay">
+      <div id="countdown-num">7</div>
+    </div>
   </div>
 
   <!-- Strength Panel -->
@@ -269,6 +300,88 @@ function playTone(freq, dur, vol = 0.4) {
     osc.start();
     osc.stop(ctx.currentTime + dur);
   } catch (_) {}
+}
+
+// ===== COUNTDOWN =====
+const COUNTDOWN_FROM = 7;
+let _cdTimer = null;
+let _cdVal   = COUNTDOWN_FROM;
+
+function playBeep() {
+  try {
+    const ctx  = getAudioCtx();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sine'; osc.frequency.value = 880;
+    gain.gain.setValueAtTime(0.5, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    osc.start(); osc.stop(ctx.currentTime + 0.12);
+  } catch (_) {}
+}
+
+function playBuzzer() {
+  try {
+    const ctx  = getAudioCtx();
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'sawtooth'; osc.frequency.value = 660;
+    gain.gain.setValueAtTime(0.7, ctx.currentTime);
+    gain.gain.setValueAtTime(0.7, ctx.currentTime + 0.55);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.75);
+    osc.start(); osc.stop(ctx.currentTime + 0.75);
+  } catch (_) {}
+}
+
+function showCountdown(n) {
+  const overlay = document.getElementById('countdown-overlay');
+  const numEl   = document.getElementById('countdown-num');
+  // force re-trigger animation
+  numEl.classList.remove('buzz');
+  numEl.textContent = n;
+  void numEl.offsetWidth;                // reflow
+  numEl.classList.toggle('buzz', n === 0);
+  overlay.classList.add('show');
+}
+
+function hideCountdown() {
+  document.getElementById('countdown-overlay').classList.remove('show');
+}
+
+function startCountdown() {
+  _cdVal = COUNTDOWN_FROM;
+  S.phase = 'countdown';
+  document.getElementById('btn-start').textContent = '停止';
+  document.getElementById('btn-start').classList.add('stop');
+  document.getElementById('bench-phase-label').textContent = '';
+  updateMiniSetDots();
+  tickCountdown();
+}
+
+function tickCountdown() {
+  if (S.phase !== 'countdown') return;
+  if (_cdVal > 0) {
+    showCountdown(_cdVal);
+    playBeep();
+    _cdVal--;
+    _cdTimer = setTimeout(tickCountdown, 1000);
+  } else {
+    // ブザーで開始
+    showCountdown('GO');
+    playBuzzer();
+    _cdTimer = setTimeout(() => {
+      hideCountdown();
+      beginTraining();
+    }, 800);
+  }
+}
+
+function cancelCountdown() {
+  clearTimeout(_cdTimer);
+  _cdTimer = null;
+  hideCountdown();
+  S.phase = 'idle';
 }
 
 // ===== VIDEO CONTROL =====
@@ -453,7 +566,8 @@ function tickIntervalDisplay() {
 }
 
 // ===== START / STOP =====
-function startTraining() {
+function beginTraining() {
+  // カウントダウン終了後に呼ばれる実際のスタート
   S.running      = true;
   S.phase        = 'rep';
   S.miniSet      = 1;
@@ -463,15 +577,12 @@ function startTraining() {
   S.totalReps    = 0;
   S.nextBeatTime = Date.now();
   startRepVideo();
-
-  const btn = document.getElementById('btn-start');
-  btn.textContent = '停止';
-  btn.classList.add('stop');
   updateDisplay();
   tick();
 }
 
 function stopTraining() {
+  cancelCountdown();
   S.running = false;
   clearTimeout(S.timer);
   clearTimeout(S.intervalTimer);
@@ -512,8 +623,11 @@ function init() {
 
   document.getElementById('btn-start').addEventListener('click', () => {
     getAudioCtx();
-    if (S.running || S.phase === 'interval') stopTraining();
-    else startTraining();
+    if (S.running || S.phase === 'interval' || S.phase === 'countdown') {
+      stopTraining();
+    } else {
+      startCountdown();
+    }
   });
 
   const sliderInterval = document.getElementById('slider-interval');
