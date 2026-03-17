@@ -424,6 +424,30 @@
   #btn-start.stop { background: #4a0e0e; border-color: #DC2626; color: #F87171; }
   #btn-start.stop:hover { background: #5a1010; }
 
+  /* ===== CALORIE BIG DISPLAY (右パネル・インターバルモード) ===== */
+  #kcal-big-wrap {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+  }
+  #kcal-big-wrap.visible { display: flex; }
+  #kcal-total-big {
+    font-size: 110px;
+    font-weight: 900;
+    color: #EAB308;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    letter-spacing: -4px;
+  }
+  .kcal-big-unit {
+    font-size: 22px;
+    color: #888;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+  }
+
   /* ===== CALORIE DISPLAY ===== */
   .hr-kcal-row {
     display: flex;
@@ -519,6 +543,10 @@
     .beat-dot { width: 16px; height: 16px; }
     .beat-dots { gap: 6px; }
     .progress-labels { font-size: 12px; }
+
+    /* Kcal big */
+    #kcal-total-big { font-size: 72px; letter-spacing: -2px; }
+    .kcal-big-unit { font-size: 16px; }
 
     /* Interval settings */
     .iset-label { min-width: 64px; font-size: 12px; }
@@ -719,6 +747,11 @@
   <!-- Right Panel -->
   <div class="step-panel">
     <div class="step-panel-inner" id="main-panel">
+      <!-- 累積カロリー大表示（インターバルモードのみ） -->
+      <div id="kcal-big-wrap">
+        <div id="kcal-total-big">0</div>
+        <div class="kcal-big-unit">kcal 消費</div>
+      </div>
       <div id="preset-name">プリセットを選択してください</div>
 
       <div class="bpm-display-wrap">
@@ -947,9 +980,11 @@ function calcCaloriesPerMin(hr, age, weight, sex) {
 }
 
 function updateCaloriesDisplay() {
-  const rate = calcCaloriesPerMin(S.hr, S.age, S.weight, S.sex);
-  document.getElementById('kcal-rate-val').textContent = (S.hr > 0 && rate > 0) ? rate.toFixed(1) : '--';
-  document.getElementById('kcal-total-val').textContent = S.totalKcal >= 1 ? Math.round(S.totalKcal) : '0';
+  const rate   = calcCaloriesPerMin(S.hr, S.age, S.weight, S.sex);
+  const total  = S.totalKcal >= 1 ? Math.round(S.totalKcal) : '0';
+  document.getElementById('kcal-rate-val').textContent  = (S.hr > 0 && rate > 0) ? rate.toFixed(1) : '--';
+  document.getElementById('kcal-total-val').textContent = total;
+  document.getElementById('kcal-total-big').textContent = total;
 }
 
 // ===== INTERVAL SETTINGS =====
@@ -1537,6 +1572,7 @@ function init() {
         document.getElementById('progress-bar-fill').style.background = 'linear-gradient(90deg, #0284C7, #22C55E, #EAB308)';
         document.getElementById('interval-settings').classList.add('hidden');
         document.getElementById('interval-live').classList.add('hidden');
+        document.getElementById('kcal-big-wrap').classList.remove('visible');
       } else if (preset.type === 'interval') {
         document.getElementById('preset-name').textContent = preset.name;
         document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
@@ -1547,6 +1583,8 @@ function init() {
         document.getElementById('prog-end').textContent = formatMMSS(S.intervalPhaseDurationSec);
         document.getElementById('progress-bar-fill').style.width = '0%';
         document.getElementById('progress-bar-fill').style.background = preset.phases[0].color;
+        document.getElementById('kcal-big-wrap').classList.add('visible');
+        updateCaloriesDisplay();
       }
     });
   });
