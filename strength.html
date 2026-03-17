@@ -81,10 +81,11 @@
     0%   { transform: scale(1.5); opacity: 0; }
     100% { transform: scale(1);   opacity: 1; }
   }
-  /* 動画ラッパー：上40%のみクロップ */
+  /* 動画ラッパー：上40%・下5%クロップ（55%表示） */
   .video-wrapper {
     width: 100%;
     max-width: 520px;
+    aspect-ratio: 16 / 4.95;  /* 55% × (9/16) = 4.95/16 */
     overflow: hidden;
     border-radius: 12px;
     isolation: isolate;
