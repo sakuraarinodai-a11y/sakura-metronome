@@ -58,25 +58,37 @@
   /* ===== MAIN ===== */
   main {
     display: grid;
-    grid-template-columns: 580px 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 0;
     overflow: hidden;
   }
 
-  /* --- Tachometer panel --- */
-  .tach-panel {
+  /* --- Bench panel --- */
+  .bench-panel {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     border-right: 1px solid #1a1a1a;
     background: #0b0b0b;
-    padding: 12px;
+    padding: 16px;
+    gap: 12px;
   }
-  #tach-svg {
+  #bench-svg {
     width: 100%;
-    max-width: 560px;
+    max-width: 480px;
     height: auto;
   }
+  #bench-phase-label {
+    font-size: clamp(22px, 3vw, 38px);
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    min-height: 48px;
+    text-align: center;
+  }
+  #bench-phase-label.rest     { color: #22C55E; }
+  #bench-phase-label.interval { color: #3B82F6; }
+  #bench-phase-label.idle     { color: #444; }
 
   /* --- Strength panel --- */
   .strength-panel {
@@ -156,23 +168,9 @@
     to   { opacity: 0.3; }
   }
 
-  /* Phase label */
-  #phase-label {
-    font-size: 36px;
-    font-weight: 900;
-    letter-spacing: 0.04em;
-    min-height: 48px;
-    text-align: center;
-    transition: color 0.2s;
-  }
-  #phase-label.rep      { color: #EF4444; }
-  #phase-label.rest     { color: #22C55E; }
-  #phase-label.interval { color: #3B82F6; }
-  #phase-label.idle     { color: #555; }
-
   /* Main number */
   #main-number {
-    font-size: 100px;
+    font-size: clamp(72px, 10vw, 110px);
     font-weight: 900;
     font-variant-numeric: tabular-nums;
     line-height: 1;
@@ -235,24 +233,9 @@
     white-space: nowrap;
   }
   .footer-btn:hover { background: #202020; }
-  .footer-btn.ok {
-    background: #0f2a1a;
-    border-color: #16A34A;
-    color: #4ADE80;
-  }
-  .footer-btn:disabled {
-    opacity: 0.38;
-    cursor: not-allowed;
-  }
   .footer-spacer { flex: 1; }
 
   /* Interval slider */
-  .interval-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-  }
   .interval-label {
     font-size: 14px;
     color: #666;
@@ -323,13 +306,18 @@
 
   #btn-start {
     background: #14532d;
-    border-color: #16A34A;
+    border: 1px solid #16A34A;
     color: #4ADE80;
     font-size: 17px;
     padding: 10px 34px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    transition: background 0.15s;
     margin-left: auto;
   }
-  #btn-start:hover:not(:disabled) { background: #166534; }
+  #btn-start:hover { background: #166534; }
   #btn-start.stop {
     background: #4a0e0e;
     border-color: #DC2626;
@@ -351,48 +339,61 @@
 
 <!-- MAIN -->
 <main>
-  <!-- Tachometer -->
-  <div class="tach-panel">
-    <svg id="tach-svg" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
+  <!-- Bench Press Animation Panel -->
+  <div class="bench-panel">
+    <svg id="bench-svg" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <filter id="needle-glow" x="-50%" y="-50%" width="200%" height="200%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
+        <filter id="bar-glow" x="-20%" y="-100%" width="140%" height="300%">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
           <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
         </filter>
       </defs>
-      <g id="g-arcs"></g>
-      <g id="g-ticks"></g>
-      <g id="g-labels"></g>
-      <g id="needle-group" filter="url(#needle-glow)" transform="translate(280,308) rotate(-120)">
-        <polygon id="needle-body" points="-4.5,14 4.5,14 2,-168 -2,-168" fill="#d8d8d8"/>
-        <polygon id="needle-tip"  points="-2,-163 2,-163 0.8,-208 -0.8,-208" fill="#EF4444"/>
-      </g>
-      <circle cx="280" cy="308" r="86" fill="#0b0b0b" stroke="#1e1e1e" stroke-width="1.5"/>
-      <circle cx="280" cy="308" r="22" fill="#161616" stroke="#3a3a3a" stroke-width="2"/>
-      <circle cx="280" cy="308" r="10" fill="#e8c4b8"/>
-      <text id="t-hr" x="280" y="287" text-anchor="middle" font-size="74" font-weight="900" fill="#fff" font-family="'Helvetica Neue',Arial,sans-serif">--</text>
-      <text id="t-unit" x="280" y="307" text-anchor="middle" font-size="16" fill="#555" font-family="'Helvetica Neue',Arial,sans-serif">bpm</text>
-      <text id="t-zone" x="280" y="344" text-anchor="middle" font-size="15" fill="#555" font-family="'Helvetica Neue',Arial,sans-serif"></text>
+
+      <!-- Bench legs -->
+      <rect x="140" y="216" width="12" height="60" rx="4" fill="#1a1a1a"/>
+      <rect x="328" y="216" width="12" height="60" rx="4" fill="#1a1a1a"/>
+
+      <!-- Bench surface -->
+      <rect x="115" y="200" width="250" height="18" rx="6" fill="#282828"/>
+
+      <!-- Person torso (lying on bench) -->
+      <rect x="155" y="183" width="170" height="20" rx="8" fill="#c8a890"/>
+
+      <!-- Head -->
+      <circle cx="342" cy="174" r="20" fill="#d4b4a0"/>
+
+      <!-- Arms — y2 is dynamic (tracks barbellY) -->
+      <line id="arm-l" x1="185" y1="188" x2="108" y2="180"
+            stroke="#c8a890" stroke-width="13" stroke-linecap="round"/>
+      <line id="arm-r" x1="295" y1="188" x2="372" y2="180"
+            stroke="#c8a890" stroke-width="13" stroke-linecap="round"/>
+
+      <!-- Barbell bar — y is dynamic -->
+      <rect id="bb-bar" x="62" y="176" width="356" height="9" rx="3"
+            fill="#c8c8c8" filter="url(#bar-glow)"/>
+
+      <!-- Plates — cy is dynamic -->
+      <ellipse id="bb-pl-big" cx="74"  cy="180" rx="11" ry="29" fill="#3a3a3a"/>
+      <ellipse id="bb-pl-sml" cx="89"  cy="180" rx="8"  ry="20" fill="#e8c4b8"/>
+      <ellipse id="bb-pr-sml" cx="391" cy="180" rx="8"  ry="20" fill="#e8c4b8"/>
+      <ellipse id="bb-pr-big" cx="406" cy="180" rx="11" ry="29" fill="#3a3a3a"/>
+
+      <!-- Collars — y is dynamic -->
+      <rect id="bb-collar-l" x="97"  y="173" width="8" height="14" rx="2" fill="#888"/>
+      <rect id="bb-collar-r" x="375" y="173" width="8" height="14" rx="2" fill="#888"/>
     </svg>
+
+    <!-- Phase label shown in bench panel -->
+    <div id="bench-phase-label" class="idle">スタート待ち</div>
   </div>
 
   <!-- Strength Panel -->
   <div class="strength-panel">
     <div class="strength-card" id="strength-card">
-      <!-- Mini set dots -->
       <div class="mini-set-dots" id="mini-set-dots"></div>
-
-      <!-- Phase label -->
-      <div id="phase-label" class="idle">スタート待ち</div>
-
-      <!-- Main number -->
       <div id="main-number">--</div>
       <div id="main-denom"></div>
-
-      <!-- Set info -->
       <div id="set-info">1セット目</div>
-
-      <!-- Total volume -->
       <div id="total-volume">総ボリューム: <span id="volume-val">0 kg</span></div>
     </div>
   </div>
@@ -401,40 +402,31 @@
 <!-- FOOTER -->
 <footer>
   <!-- Row 1: Interval slider -->
-  <div class="footer-row interval-row">
+  <div class="footer-row">
     <span class="interval-label">インターバル</span>
     <input type="range" id="slider-interval" min="30" max="180" step="5" value="60">
     <span id="interval-val">60秒</span>
   </div>
 
-  <!-- Row 2: Weight + BT + Start -->
+  <!-- Row 2: Weight + Start -->
   <div class="footer-row">
     <button class="weight-btn" id="btn-weight-down">◀</button>
     <div id="weight-display">20 kg</div>
     <button class="weight-btn" id="btn-weight-up">▶</button>
     <div class="footer-spacer"></div>
-    <button class="footer-btn" id="btn-bt">🔵 Bluetooth</button>
-    <button class="footer-btn" id="btn-start">開始</button>
+    <button id="btn-start">開始</button>
   </div>
 </footer>
 
 <script>
 // ===== CONSTANTS =====
-const ZONES = [
-  { min: 0,    max: 0.50, color: '#555555', label: '安静' },
-  { min: 0.50, max: 0.60, color: '#0284C7', label: 'リハビリ' },
-  { min: 0.60, max: 0.70, color: '#16A34A', label: '有酸素運動' },
-  { min: 0.70, max: 0.85, color: '#D97706', label: 'トレーニング' },
-  { min: 0.85, max: 1.00, color: '#DC2626', label: 'アスリート' },
-];
-const CX = 280, CY = 308, R_IN = 210, R_OUT = 250;
-const START_DEG = -120, SPAN_DEG = 240;
-const PIVOT_BPM = 100, PIVOT_RATIO = 0.25;
-
-const TEMPO = 33;
+const TEMPO         = 33;
 const REPS_PER_MINI = 13;
-const REST_BEATS = 6;
-const MINI_SETS = 4;
+const REST_BEATS    = 6;
+const MINI_SETS     = 4;
+
+const BB_Y_UP   = 108;   // arms extended (barbell at top)
+const BB_Y_DOWN = 180;   // bar on chest (bottom)
 
 // ===== STATE =====
 const S = {
@@ -452,11 +444,6 @@ const S = {
   displayTimer: null,
   weight: 20,
   interval: 60,
-  hr: 0,
-  peakHR: 0,
-  age: 40,
-  maxHR: 180,
-  btDevice: null,
 };
 
 // ===== AUDIO =====
@@ -468,14 +455,14 @@ function getAudioCtx() {
   return _audioCtx;
 }
 
-function playTone(freq, dur, vol = 0.4, type = 'sine') {
+function playTone(freq, dur, vol = 0.4) {
   try {
     const ctx = getAudioCtx();
     const osc = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
-    osc.type = type;
+    osc.type = 'sine';
     osc.frequency.value = freq;
     gain.gain.setValueAtTime(vol, ctx.currentTime);
     gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
@@ -484,134 +471,43 @@ function playTone(freq, dur, vol = 0.4, type = 'sine') {
   } catch (_) {}
 }
 
-// ===== TACHOMETER =====
-function degToRad(d) { return d * Math.PI / 180; }
+// ===== BENCH PRESS ANIMATION =====
+let _benchAnimId = null;
 
-function hrToAngle(hr, maxHR) {
-  if (hr <= PIVOT_BPM) {
-    return START_DEG + (hr / PIVOT_BPM) * PIVOT_RATIO * SPAN_DEG;
-  }
-  const clamped = Math.min(hr, maxHR);
-  return START_DEG + PIVOT_RATIO * SPAN_DEG
-    + ((clamped - PIVOT_BPM) / Math.max(1, maxHR - PIVOT_BPM)) * (1 - PIVOT_RATIO) * SPAN_DEG;
+function easeInOut(t) {
+  return 0.5 - 0.5 * Math.cos(t * Math.PI);
 }
 
-function ratioToAngle(ratio) {
-  return START_DEG + ratio * SPAN_DEG;
+function updateBenchPose(barbellY) {
+  document.getElementById('bb-bar').setAttribute('y', barbellY - 4);
+  ['bb-pl-big','bb-pl-sml','bb-pr-sml','bb-pr-big'].forEach(id =>
+    document.getElementById(id).setAttribute('cy', barbellY));
+  document.getElementById('bb-collar-l').setAttribute('y', barbellY - 7);
+  document.getElementById('bb-collar-r').setAttribute('y', barbellY - 7);
+  document.getElementById('arm-l').setAttribute('y2', barbellY);
+  document.getElementById('arm-r').setAttribute('y2', barbellY);
 }
 
-function polarToXY(cx, cy, r, deg) {
-  const rad = degToRad(deg);
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
-}
-
-function arcPath(cx, cy, rIn, rOut, startDeg, endDeg) {
-  const s1 = polarToXY(cx, cy, rIn, startDeg);
-  const s2 = polarToXY(cx, cy, rOut, startDeg);
-  const e1 = polarToXY(cx, cy, rIn, endDeg);
-  const e2 = polarToXY(cx, cy, rOut, endDeg);
-  const large = (endDeg - startDeg) > 180 ? 1 : 0;
-  return [
-    `M ${s2.x} ${s2.y}`,
-    `A ${rOut} ${rOut} 0 ${large} 1 ${e2.x} ${e2.y}`,
-    `L ${e1.x} ${e1.y}`,
-    `A ${rIn} ${rIn} 0 ${large} 0 ${s1.x} ${s1.y}`,
-    'Z'
-  ].join(' ');
-}
-
-function drawTach(maxHR) {
-  const gArcs   = document.getElementById('g-arcs');
-  const gTicks  = document.getElementById('g-ticks');
-  const gLabels = document.getElementById('g-labels');
-  gArcs.innerHTML = '';
-  gTicks.innerHTML = '';
-  gLabels.innerHTML = '';
-
-  ZONES.forEach(zone => {
-    const startAngle = ratioToAngle(zone.min);
-    const endAngle   = ratioToAngle(zone.max);
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', arcPath(CX, CY, R_IN, R_OUT, startAngle, endAngle));
-    path.setAttribute('fill', zone.color);
-    path.setAttribute('opacity', '0.85');
-    path.setAttribute('id', 'arc-' + zone.label);
-    gArcs.appendChild(path);
-  });
-
-  const tickBPMs = [];
-  for (let bpm = 0; bpm <= maxHR; bpm += 10) tickBPMs.push(bpm);
-
-  tickBPMs.forEach(bpm => {
-    const angle = hrToAngle(bpm, maxHR);
-    const isMajor = bpm % 20 === 0;
-    const rTickIn  = isMajor ? R_IN - 14 : R_IN - 7;
-    const rTickOut = R_IN - 2;
-    const p1 = polarToXY(CX, CY, rTickIn, angle);
-    const p2 = polarToXY(CX, CY, rTickOut, angle);
-    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    line.setAttribute('x1', p1.x); line.setAttribute('y1', p1.y);
-    line.setAttribute('x2', p2.x); line.setAttribute('y2', p2.y);
-    line.setAttribute('stroke', isMajor ? '#aaa' : '#555');
-    line.setAttribute('stroke-width', isMajor ? '2' : '1');
-    gTicks.appendChild(line);
-
-    if (isMajor) {
-      const rLabel = R_IN - 28;
-      const lp = polarToXY(CX, CY, rLabel, angle);
-      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-      text.setAttribute('x', lp.x);
-      text.setAttribute('y', lp.y);
-      text.setAttribute('text-anchor', 'middle');
-      text.setAttribute('dominant-baseline', 'central');
-      text.setAttribute('font-size', '13');
-      text.setAttribute('fill', '#666');
-      text.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
-      text.textContent = bpm;
-      gLabels.appendChild(text);
-    }
-  });
-
-  ZONES.forEach(zone => {
-    if (zone.label === '安静') return;
-    const midRatio = (zone.min + zone.max) / 2;
-    const midAngle = ratioToAngle(midRatio);
-    const rLabel = (R_IN + R_OUT) / 2;
-    const lp = polarToXY(CX, CY, rLabel, midAngle);
-    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    text.setAttribute('x', lp.x);
-    text.setAttribute('y', lp.y);
-    text.setAttribute('text-anchor', 'middle');
-    text.setAttribute('dominant-baseline', 'central');
-    text.setAttribute('font-size', '11');
-    text.setAttribute('fill', '#fff');
-    text.setAttribute('font-weight', '600');
-    text.setAttribute('transform', `rotate(${midAngle + 90}, ${lp.x}, ${lp.y})`);
-    text.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
-    text.textContent = zone.label;
-    gLabels.appendChild(text);
-  });
-}
-
-function moveNeedle(hr, maxHR) {
-  const angle = hrToAngle(hr, maxHR);
-  const group = document.getElementById('needle-group');
-  group.setAttribute('transform', `translate(${CX},${CY}) rotate(${angle})`);
-}
-
-function highlightZone(hr, maxHR) {
-  const ratio = hr / maxHR;
-  let currentZone = ZONES[0].label;
-  ZONES.forEach(z => {
-    const el = document.getElementById('arc-' + z.label);
-    if (ratio >= z.min && ratio < z.max) {
-      currentZone = z.label;
-      if (el) el.setAttribute('opacity', '1');
+function triggerRepAnim() {
+  if (_benchAnimId) cancelAnimationFrame(_benchAnimId);
+  const beatMs = 60000 / TEMPO;
+  const startTime = performance.now();
+  function frame(now) {
+    const t = Math.min((now - startTime) / beatMs, 1);
+    // 0→0.4: lower bar, 0.4→0.6: hold at bottom, 0.6→1.0: press up
+    let p;
+    if (t < 0.4)      p = easeInOut(t / 0.4);
+    else if (t < 0.6) p = 1;
+    else              p = 1 - easeInOut((t - 0.6) / 0.4);
+    updateBenchPose(BB_Y_UP + (BB_Y_DOWN - BB_Y_UP) * p);
+    if (t < 1) {
+      _benchAnimId = requestAnimationFrame(frame);
     } else {
-      if (el) el.setAttribute('opacity', '0.45');
+      updateBenchPose(BB_Y_UP);
+      _benchAnimId = null;
     }
-  });
-  return currentZone;
+  }
+  _benchAnimId = requestAnimationFrame(frame);
 }
 
 // ===== MINI SET DOTS =====
@@ -652,11 +548,6 @@ function updateMiniSetDots() {
   }
 }
 
-// ===== VOLUME =====
-function getTotalVolume() {
-  return S.weight * S.totalReps;
-}
-
 // ===== MAIN NUMBER FLASH =====
 let _flashTimer = null;
 function flashMain() {
@@ -668,12 +559,12 @@ function flashMain() {
 
 // ===== UPDATE DISPLAY =====
 function updateDisplay() {
-  const card = document.getElementById('strength-card');
-  const phaseLabel = document.getElementById('phase-label');
+  const card       = document.getElementById('strength-card');
   const mainNumber = document.getElementById('main-number');
   const mainDenom  = document.getElementById('main-denom');
   const setInfo    = document.getElementById('set-info');
   const volumeVal  = document.getElementById('volume-val');
+  const benchLabel = document.getElementById('bench-phase-label');
 
   // Card border
   card.classList.remove('phase-rep', 'phase-rest', 'phase-interval');
@@ -681,20 +572,19 @@ function updateDisplay() {
   if (S.phase === 'rest')     card.classList.add('phase-rest');
   if (S.phase === 'interval') card.classList.add('phase-interval');
 
-  // Phase label
-  phaseLabel.classList.remove('rep', 'rest', 'interval', 'idle');
+  // Bench phase label (empty during rep — animation speaks for itself)
+  benchLabel.classList.remove('rest', 'interval', 'idle');
   if (S.phase === 'rep') {
-    phaseLabel.textContent = '全力！';
-    phaseLabel.classList.add('rep');
+    benchLabel.textContent = '';
   } else if (S.phase === 'rest') {
-    phaseLabel.textContent = '小休止';
-    phaseLabel.classList.add('rest');
+    benchLabel.textContent = '小休止';
+    benchLabel.classList.add('rest');
   } else if (S.phase === 'interval') {
-    phaseLabel.textContent = 'インターバル';
-    phaseLabel.classList.add('interval');
+    benchLabel.textContent = 'インターバル';
+    benchLabel.classList.add('interval');
   } else {
-    phaseLabel.textContent = 'スタート待ち';
-    phaseLabel.classList.add('idle');
+    benchLabel.textContent = 'スタート待ち';
+    benchLabel.classList.add('idle');
   }
 
   // Main number
@@ -713,14 +603,8 @@ function updateDisplay() {
     mainDenom.textContent = '';
   }
 
-  // Set info
   setInfo.textContent = S.setNum + 'セット目';
-
-  // Volume
-  const vol = getTotalVolume();
-  volumeVal.textContent = vol.toLocaleString() + ' kg';
-
-  // Mini set dots
+  volumeVal.textContent = (S.weight * S.totalReps).toLocaleString() + ' kg';
   updateMiniSetDots();
 }
 
@@ -729,6 +613,7 @@ function onBeat() {
   if (S.phase === 'rep') {
     S.repCount++;
     S.totalReps++;
+    triggerRepAnim();
     playTone(880, 0.06, 0.35);
     flashMain();
     if (S.repCount >= REPS_PER_MINI) {
@@ -739,6 +624,7 @@ function onBeat() {
       } else {
         S.phase = 'rest';
         S.restCount = 0;
+        updateBenchPose(BB_Y_DOWN);
         playTone(660, 0.2, 0.4);
       }
     }
@@ -767,6 +653,8 @@ function tick() {
 // ===== INTERVAL =====
 function startInterval() {
   S.phase = 'interval';
+  if (_benchAnimId) { cancelAnimationFrame(_benchAnimId); _benchAnimId = null; }
+  updateBenchPose(BB_Y_UP);
   clearTimeout(S.timer);
   S.intervalEndTime = Date.now() + S.interval * 1000;
   S.intervalTimer = setTimeout(endInterval, S.interval * 1000);
@@ -803,9 +691,11 @@ function startTraining() {
   S.setNum = 1;
   S.totalReps = 0;
   S.nextBeatTime = Date.now();
+  updateBenchPose(BB_Y_UP);
 
-  document.getElementById('btn-start').textContent = '停止';
-  document.getElementById('btn-start').classList.add('stop');
+  const btn = document.getElementById('btn-start');
+  btn.textContent = '停止';
+  btn.classList.add('stop');
   updateDisplay();
   tick();
 }
@@ -815,57 +705,17 @@ function stopTraining() {
   clearTimeout(S.timer);
   clearTimeout(S.intervalTimer);
   clearTimeout(S.displayTimer);
+  if (_benchAnimId) { cancelAnimationFrame(_benchAnimId); _benchAnimId = null; }
   S.timer = null;
   S.intervalTimer = null;
   S.displayTimer = null;
   S.phase = 'idle';
+  updateBenchPose(BB_Y_UP);
 
-  document.getElementById('btn-start').textContent = '開始';
-  document.getElementById('btn-start').classList.remove('stop');
+  const btn = document.getElementById('btn-start');
+  btn.textContent = '開始';
+  btn.classList.remove('stop');
   updateDisplay();
-}
-
-// ===== BLUETOOTH =====
-async function connectBT() {
-  if (S.btDevice) {
-    try { S.btDevice.gatt.disconnect(); } catch (_) {}
-    S.btDevice = null;
-    document.getElementById('btn-bt').textContent = '🔵 Bluetooth';
-    document.getElementById('btn-bt').classList.remove('ok');
-    return;
-  }
-  try {
-    const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] });
-    dev.addEventListener('gattserverdisconnected', () => {
-      S.btDevice = null;
-      document.getElementById('btn-bt').textContent = '🔵 Bluetooth';
-      document.getElementById('btn-bt').classList.remove('ok');
-    });
-    const server = await dev.gatt.connect();
-    const svc = await server.getPrimaryService('heart_rate');
-    const chr = await svc.getCharacteristic('heart_rate_measurement');
-    await chr.startNotifications();
-    chr.addEventListener('characteristicvaluechanged', onHR);
-    S.btDevice = dev;
-    document.getElementById('btn-bt').textContent = '💚 接続済み';
-    document.getElementById('btn-bt').classList.add('ok');
-  } catch (e) {
-    if (e.name !== 'NotFoundError') alert('Bluetooth接続エラー: ' + e.message);
-  }
-}
-
-function onHR(e) {
-  const v = e.target.value;
-  const fl = v.getUint8(0);
-  const hr = (fl & 0x01) ? v.getUint16(1, true) : v.getUint8(1);
-  S.hr = hr;
-  if (hr > S.peakHR) S.peakHR = hr;
-  document.getElementById('t-hr').textContent = hr;
-  moveNeedle(hr, S.maxHR);
-  const zName = highlightZone(hr, S.maxHR);
-  const zObj = ZONES.find(z => z.label === zName);
-  document.getElementById('t-zone').textContent = zName;
-  document.getElementById('t-zone').setAttribute('fill', zObj?.color || '#666');
 }
 
 // ===== WEIGHT CONTROL =====
@@ -887,13 +737,12 @@ function updateClock() {
 
 // ===== INIT =====
 function init() {
-  drawTach(S.maxHR);
   buildMiniSetDots();
+  updateBenchPose(BB_Y_UP);
   updateDisplay();
   updateClock();
   setInterval(updateClock, 1000);
 
-  // Start/Stop
   document.getElementById('btn-start').addEventListener('click', () => {
     getAudioCtx();
     if (S.running || S.phase === 'interval') {
@@ -903,10 +752,6 @@ function init() {
     }
   });
 
-  // Bluetooth
-  document.getElementById('btn-bt').addEventListener('click', connectBT);
-
-  // Interval slider
   const sliderInterval = document.getElementById('slider-interval');
   const intervalVal    = document.getElementById('interval-val');
   sliderInterval.addEventListener('input', () => {
@@ -914,15 +759,9 @@ function init() {
     intervalVal.textContent = S.interval + '秒';
   });
 
-  // Weight buttons
-  document.getElementById('btn-weight-down').addEventListener('click', () => {
-    setWeight(S.weight - 5);
-  });
-  document.getElementById('btn-weight-up').addEventListener('click', () => {
-    setWeight(S.weight + 5);
-  });
+  document.getElementById('btn-weight-down').addEventListener('click', () => setWeight(S.weight - 5));
+  document.getElementById('btn-weight-up').addEventListener('click', () => setWeight(S.weight + 5));
 
-  // Fullscreen
   document.getElementById('btn-fullscreen').addEventListener('click', () => {
     if (!document.fullscreenElement) {
       document.documentElement.requestFullscreen().catch(() => {});
