@@ -330,32 +330,57 @@
   <!-- Strength Panel -->
   <div class="strength-panel">
 
-    <!-- ピアノメトロノーム（カード外・上） -->
+    <!-- デジタルメトロノーム（カード外・上） -->
     <svg id="metronome-svg" viewBox="-75 -65 150 295" preserveAspectRatio="xMidYMid meet">
-      <!-- Body shadow depth -->
-      <polygon points="-67,215 67,215 45,17 -45,17" fill="#060606"/>
-      <!-- Side faces (3D) -->
-      <polygon points="-63,211 -57,205 -35,30 -41,21" fill="#1c1508"/>
-      <polygon points="63,211 57,205 35,30 41,21" fill="#0e0b04"/>
-      <!-- Main body -->
-      <polygon points="-60,208 60,208 39,22 -39,22" fill="#171107" stroke="#2a1d09" stroke-width="1.5"/>
-      <!-- Face panel -->
-      <polygon points="-49,200 49,200 28,34 -28,34" fill="#0f0f0f"/>
-      <!-- Scale arc (pivot=0,85, r=66) -->
-      <path d="M -31,27 A 66,66 0 0,1 31,27" fill="none" stroke="#2a2a2a" stroke-width="2"/>
-      <!-- Center tick (θ=0°) -->
-      <line x1="0" y1="19" x2="0" y2="30" stroke="#444" stroke-width="2.5"/>
-      <!-- ±9° ticks -->
-      <line x1="10.3" y1="19.8" x2="8.8"  y2="29.7" stroke="#333" stroke-width="1.5"/>
-      <line x1="-10.3" y1="19.8" x2="-8.8"  y2="29.7" stroke="#333" stroke-width="1.5"/>
-      <!-- ±18° ticks -->
-      <line x1="20.4" y1="22.2" x2="17.3" y2="31.7" stroke="#2a2a2a" stroke-width="1.5"/>
-      <line x1="-20.4" y1="22.2" x2="-17.3" y2="31.7" stroke="#2a2a2a" stroke-width="1.5"/>
-      <!-- ±28° ticks (max swing) -->
-      <line x1="31.0" y1="26.7" x2="26.3" y2="35.6" stroke="#222" stroke-width="1.5"/>
-      <line x1="-31.0" y1="26.7" x2="-26.3" y2="35.6" stroke="#222" stroke-width="1.5"/>
+      <defs>
+        <linearGradient id="body-g" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#16202c"/>
+          <stop offset="100%" stop-color="#080c10"/>
+        </linearGradient>
+        <filter id="glow-n" x="-60%" y="-10%" width="220%" height="120%">
+          <feGaussianBlur stdDeviation="2" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-w" x="-80%" y="-80%" width="360%" height="360%">
+          <feGaussianBlur stdDeviation="4" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-tip" x="-200%" y="-200%" width="600%" height="600%">
+          <feGaussianBlur stdDeviation="5" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+        <filter id="glow-piv" x="-100%" y="-100%" width="300%" height="300%">
+          <feGaussianBlur stdDeviation="3" result="b"/>
+          <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
 
-      <!-- Pendulum group (pivot at 0,85) -->
+      <!-- Body fill -->
+      <polygon points="-60,208 60,208 39,22 -39,22" fill="url(#body-g)"/>
+      <!-- Body outline (bright tech edge) -->
+      <polygon points="-60,208 60,208 39,22 -39,22"
+               fill="none" stroke="#2a4060" stroke-width="1.5"/>
+      <!-- Corner bracket accents (top) -->
+      <polyline points="-29,22 -39,22 -39,36" fill="none" stroke="#3a6090" stroke-width="1.5"/>
+      <polyline points="29,22 39,22 39,36"    fill="none" stroke="#3a6090" stroke-width="1.5"/>
+      <!-- Corner bracket accents (bottom) -->
+      <polyline points="-50,195 -60,208 -48,208" fill="none" stroke="#1e3050" stroke-width="1"/>
+      <polyline points="50,195 60,208 48,208"     fill="none" stroke="#1e3050" stroke-width="1"/>
+
+      <!-- Scale arc (pivot=0,85 r=66) -->
+      <path d="M -31,27 A 66,66 0 0,1 31,27"
+            fill="none" stroke="#1e3050" stroke-width="1.5" stroke-dasharray="2,3"/>
+      <!-- Scale LED dots -->
+      <!-- θ=0°: (0,19) -->
+      <circle cx="0"    cy="19"   r="3"   fill="#60a0e0"/>
+      <!-- θ=±13°: (14.8,20.7) -->
+      <circle cx="14.8" cy="20.7" r="2"   fill="#3a6090" opacity="0.8"/>
+      <circle cx="-14.8" cy="20.7" r="2"  fill="#3a6090" opacity="0.8"/>
+      <!-- θ=±26°: (28.9,25.7) -->
+      <circle cx="28.9" cy="25.7" r="2"   fill="#243050" opacity="0.7"/>
+      <circle cx="-28.9" cy="25.7" r="2"  fill="#243050" opacity="0.7"/>
+
+      <!-- Pendulum group -->
       <g id="pendulum-arm" transform="rotate(0,0,85)">
         <animateTransform
           id="pendulum-anim"
@@ -369,30 +394,36 @@
           repeatCount="indefinite"
           begin="indefinite"
         />
-        <!-- Counterweight rod (below pivot) -->
-        <rect x="-3.5" y="86" width="7" height="104" rx="3" fill="#3a3a3a"/>
-        <!-- Main needle rod -->
-        <rect x="-2.5" y="-54" width="5" height="142" rx="2.5" fill="#c4c4c4"/>
-        <!-- Needle highlight -->
-        <rect x="-0.5" y="-52" width="1.5" height="138" rx="0.75" fill="#eee" opacity="0.3"/>
-        <!-- Adjustable weight (diamond) on needle above body -->
-        <polygon points="0,-28 17,-10 0,8 -17,-10" fill="#e8c4b8" stroke="#b89080" stroke-width="1.5"/>
-        <polygon points="0,-23 10,-10 0,3 -10,-10" fill="#f5ddd0" opacity="0.4"/>
-        <!-- Needle tip ball -->
-        <circle cx="0" cy="-50" r="6" fill="#d0d0d0" stroke="#999" stroke-width="1.5"/>
-        <circle cx="0" cy="-50" r="2.5" fill="#eee"/>
+        <!-- Counterweight (below pivot) -->
+        <rect x="-2" y="86" width="4" height="100" rx="2" fill="#1a2530"/>
+        <!-- Needle with glow -->
+        <rect x="-1.5" y="-54" width="3" height="142" rx="1.5"
+              fill="#c8ddf0" filter="url(#glow-n)"/>
+        <!-- Weight diamond with glow -->
+        <polygon points="0,-30 15,-12 0,6 -15,-12"
+                 fill="#e8c4b8" stroke="#ffddcc" stroke-width="1"
+                 filter="url(#glow-w)"/>
+        <!-- Weight inner highlight -->
+        <polygon points="0,-25 8,-12 0,1 -8,-12" fill="#fff5f0" opacity="0.35"/>
+        <!-- Needle tip glow ball -->
+        <circle cx="0" cy="-51" r="7" fill="#80b8e8" filter="url(#glow-tip)" opacity="0.6"/>
+        <circle cx="0" cy="-51" r="3.5" fill="#c0d8f0"/>
+        <circle cx="0" cy="-51" r="1.5" fill="#ffffff"/>
       </g>
 
-      <!-- Pivot bearing (rendered on top) -->
-      <circle cx="0" cy="85" r="11" fill="#1e1e1e" stroke="#454545" stroke-width="2"/>
-      <circle cx="0" cy="85" r="5.5" fill="#555"/>
-      <circle cx="0" cy="85" r="2.5" fill="#888"/>
-      <circle cx="0" cy="85" r="1" fill="#aaa"/>
+      <!-- Pivot with glow rings -->
+      <circle cx="0" cy="85" r="12" fill="#0a1420" stroke="#2a5080" stroke-width="1.5"
+              filter="url(#glow-piv)"/>
+      <circle cx="0" cy="85" r="6"  fill="#1a3050" stroke="#3a70a0" stroke-width="1"/>
+      <circle cx="0" cy="85" r="2.5" fill="#60a0e0"/>
+      <circle cx="0" cy="85" r="1"   fill="#a0d0ff"/>
+
       <!-- Base bar -->
-      <rect x="-54" y="205" width="108" height="9" rx="4.5" fill="#181208" stroke="#2a1d09" stroke-width="1"/>
+      <rect x="-52" y="204" width="104" height="7" rx="3.5"
+            fill="#0a1420" stroke="#1e3050" stroke-width="1"/>
       <!-- Feet -->
-      <ellipse cx="-33" cy="217" rx="17" ry="5.5" fill="#111"/>
-      <ellipse cx="33" cy="217" rx="17" ry="5.5" fill="#111"/>
+      <ellipse cx="-30" cy="213" rx="14" ry="4" fill="#080c10" stroke="#1a2a3a" stroke-width="1"/>
+      <ellipse cx="30"  cy="213" rx="14" ry="4" fill="#080c10" stroke="#1a2a3a" stroke-width="1"/>
     </svg>
 
     <div class="strength-card" id="strength-card">
