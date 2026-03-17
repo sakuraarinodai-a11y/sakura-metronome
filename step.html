@@ -126,15 +126,10 @@
     display: block;
   }
 
-  /* Pendulum animation */
+  /* Pendulum animation (controlled by Web Animations API) */
   #pendulum-group {
     transform-box: fill-box;
     transform-origin: 50% 0%;
-    animation: pendulum-swing 0.6s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite alternate;
-  }
-  @keyframes pendulum-swing {
-    0%   { transform: rotate(-26deg); }
-    100% { transform: rotate(26deg); }
   }
 
   /* --- Right panel --- */
@@ -545,11 +540,29 @@ function updateHRBar(hr, maxHR) {
 }
 
 // ===== METRONOME ANIMATION =====
+let _pendulumAnim = null;
+
 function updatePendulumSpeed(bpm) {
   if (bpm <= 0) return;
-  // alternateなので片道=1ビート=60/bpm秒
-  const halfPeriod = 60 / bpm;
-  document.getElementById('pendulum-group').style.animationDuration = halfPeriod + 's';
+  const halfPeriodMs = (60 / bpm) * 1000; // 片道（ms）
+  if (_pendulumAnim) {
+    // 位相を保ったまま速度だけ変更
+    _pendulumAnim.effect.updateTiming({ duration: halfPeriodMs });
+  } else {
+    const group = document.getElementById('pendulum-group');
+    _pendulumAnim = group.animate(
+      [
+        { transform: 'rotate(-26deg)' },
+        { transform: 'rotate(26deg)' },
+      ],
+      {
+        duration: halfPeriodMs,
+        easing: 'cubic-bezier(0.45, 0.05, 0.55, 0.95)',
+        direction: 'alternate',
+        iterations: Infinity,
+      }
+    );
+  }
 }
 
 // ===== BEAT DOTS =====
@@ -749,6 +762,7 @@ function init() {
   buildBeatDots();
   updateClock();
   setInterval(updateClock, 1000);
+  updatePendulumSpeed(75); // 起動時からデフォルト速度で振り子を開始
 
   PRESETS.forEach((preset, idx) => {
     const btn = document.getElementById('btn-preset-' + idx);
