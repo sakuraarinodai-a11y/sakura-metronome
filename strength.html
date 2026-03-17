@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>サクラ整骨院 筋トレ</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #080808;
+    color: #fff;
+    font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', sans-serif;
+    height: 100dvh;
+    overflow: hidden;
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+  }
+
+  /* ===== HEADER ===== */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 24px;
+    border-bottom: 1px solid #1a1a1a;
+    background: #0d0d0d;
+  }
+  .header-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #e8c4b8;
+  }
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  #clock {
+    font-size: 22px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    color: #aaa;
+  }
+  #btn-fullscreen {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    color: #aaa;
+    font-size: 18px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  #btn-fullscreen:hover { background: #252525; }
+
+  /* ===== MAIN ===== */
+  main {
+    display: grid;
+    grid-template-columns: 580px 1fr;
+    gap: 0;
+    overflow: hidden;
+  }
+
+  /* --- Tachometer panel --- */
+  .tach-panel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-right: 1px solid #1a1a1a;
+    background: #0b0b0b;
+    padding: 12px;
+  }
+  #tach-svg {
+    width: 100%;
+    max-width: 560px;
+    height: auto;
+  }
+
+  /* --- Strength panel --- */
+  .strength-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 28px;
+    gap: 16px;
+    background: #0d0d0d;
+  }
+
+  .strength-card {
+    width: 100%;
+    max-width: 460px;
+    background: #111;
+    border: 2px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    box-shadow: 0 0 0 transparent;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .strength-card.phase-rep {
+    border-color: #7f1d1d;
+    box-shadow: 0 0 28px rgba(239,68,68,0.18);
+  }
+  .strength-card.phase-rest {
+    border-color: #14532d;
+    box-shadow: 0 0 28px rgba(34,197,94,0.18);
+  }
+  .strength-card.phase-interval {
+    border-color: #1e3a5f;
+    box-shadow: 0 0 28px rgba(59,130,246,0.18);
+  }
+
+  /* Mini set dots */
+  .mini-set-dots {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+  }
+  .mini-dot {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #1e1e1e;
+    border: 2px solid #333;
+    transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+  }
+  .mini-dot.done {
+    background: #22C55E;
+    border-color: #22C55E;
+    box-shadow: 0 0 8px #22C55E55;
+  }
+  .mini-dot.current {
+    background: #1e1e1e;
+    border-color: #EF4444;
+    box-shadow: 0 0 10px #EF444466;
+    animation: blink-dot 0.7s ease-in-out infinite alternate;
+  }
+  .mini-dot.current.rest {
+    border-color: #22C55E;
+    box-shadow: 0 0 10px #22C55E66;
+  }
+  .mini-dot.current.interval {
+    border-color: #3B82F6;
+    box-shadow: 0 0 10px #3B82F666;
+    animation: none;
+    background: #3B82F633;
+  }
+  @keyframes blink-dot {
+    from { opacity: 1; }
+    to   { opacity: 0.3; }
+  }
+
+  /* Phase label */
+  #phase-label {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    min-height: 48px;
+    text-align: center;
+    transition: color 0.2s;
+  }
+  #phase-label.rep      { color: #EF4444; }
+  #phase-label.rest     { color: #22C55E; }
+  #phase-label.interval { color: #3B82F6; }
+  #phase-label.idle     { color: #555; }
+
+  /* Main number */
+  #main-number {
+    font-size: 100px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+    letter-spacing: -3px;
+    text-align: center;
+    color: #fff;
+    min-height: 100px;
+  }
+  #main-number.flash { color: #e8c4b8; }
+  #main-denom {
+    font-size: 28px;
+    color: #555;
+    font-weight: 500;
+    min-height: 36px;
+  }
+
+  /* Set info */
+  #set-info {
+    font-size: 22px;
+    font-weight: 700;
+    color: #aaa;
+  }
+
+  /* Volume */
+  #total-volume {
+    font-size: 16px;
+    color: #555;
+  }
+  #total-volume span {
+    color: #e8c4b8;
+    font-weight: 700;
+  }
+
+  /* ===== FOOTER ===== */
+  footer {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 10px 24px 12px;
+    border-top: 1px solid #1a1a1a;
+    background: #0d0d0d;
+  }
+  .footer-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .footer-btn {
+    background: #161616;
+    border: 1px solid #2a2a2a;
+    color: #ccc;
+    font-size: 15px;
+    padding: 10px 22px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+  }
+  .footer-btn:hover { background: #202020; }
+  .footer-btn.ok {
+    background: #0f2a1a;
+    border-color: #16A34A;
+    color: #4ADE80;
+  }
+  .footer-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+  }
+  .footer-spacer { flex: 1; }
+
+  /* Interval slider */
+  .interval-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+  .interval-label {
+    font-size: 14px;
+    color: #666;
+    white-space: nowrap;
+    min-width: 80px;
+  }
+  #slider-interval {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    border-radius: 3px;
+    background: #2a2a2a;
+    outline: none;
+    cursor: pointer;
+  }
+  #slider-interval::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3B82F6;
+    cursor: pointer;
+  }
+  #slider-interval::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #3B82F6;
+    cursor: pointer;
+    border: none;
+  }
+  #interval-val {
+    font-size: 15px;
+    color: #aaa;
+    font-variant-numeric: tabular-nums;
+    min-width: 50px;
+    text-align: right;
+  }
+
+  /* Weight buttons */
+  .weight-btn {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #aaa;
+    font-size: 18px;
+    width: 36px;
+    height: 36px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+    flex-shrink: 0;
+  }
+  .weight-btn:hover { background: #252525; }
+  #weight-display {
+    font-size: 18px;
+    font-weight: 700;
+    color: #fff;
+    min-width: 60px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+
+  #btn-start {
+    background: #14532d;
+    border-color: #16A34A;
+    color: #4ADE80;
+    font-size: 17px;
+    padding: 10px 34px;
+    margin-left: auto;
+  }
+  #btn-start:hover:not(:disabled) { background: #166534; }
+  #btn-start.stop {
+    background: #4a0e0e;
+    border-color: #DC2626;
+    color: #F87171;
+  }
+  #btn-start.stop:hover { background: #5a1010; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="header-title">サクラ整骨院 筋トレ</div>
+  <div class="header-right">
+    <div id="clock">--:--:--</div>
+    <button id="btn-fullscreen" title="全画面">⛶</button>
+  </div>
+</header>
+
+<!-- MAIN -->
+<main>
+  <!-- Tachometer -->
+  <div class="tach-panel">
+    <svg id="tach-svg" viewBox="0 0 560 360" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <filter id="needle-glow" x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="3" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <g id="g-arcs"></g>
+      <g id="g-ticks"></g>
+      <g id="g-labels"></g>
+      <g id="needle-group" filter="url(#needle-glow)" transform="translate(280,308) rotate(-120)">
+        <polygon id="needle-body" points="-4.5,14 4.5,14 2,-168 -2,-168" fill="#d8d8d8"/>
+        <polygon id="needle-tip"  points="-2,-163 2,-163 0.8,-208 -0.8,-208" fill="#EF4444"/>
+      </g>
+      <circle cx="280" cy="308" r="86" fill="#0b0b0b" stroke="#1e1e1e" stroke-width="1.5"/>
+      <circle cx="280" cy="308" r="22" fill="#161616" stroke="#3a3a3a" stroke-width="2"/>
+      <circle cx="280" cy="308" r="10" fill="#e8c4b8"/>
+      <text id="t-hr" x="280" y="287" text-anchor="middle" font-size="74" font-weight="900" fill="#fff" font-family="'Helvetica Neue',Arial,sans-serif">--</text>
+      <text id="t-unit" x="280" y="307" text-anchor="middle" font-size="16" fill="#555" font-family="'Helvetica Neue',Arial,sans-serif">bpm</text>
+      <text id="t-zone" x="280" y="344" text-anchor="middle" font-size="15" fill="#555" font-family="'Helvetica Neue',Arial,sans-serif"></text>
+    </svg>
+  </div>
+
+  <!-- Strength Panel -->
+  <div class="strength-panel">
+    <div class="strength-card" id="strength-card">
+      <!-- Mini set dots -->
+      <div class="mini-set-dots" id="mini-set-dots"></div>
+
+      <!-- Phase label -->
+      <div id="phase-label" class="idle">スタート待ち</div>
+
+      <!-- Main number -->
+      <div id="main-number">--</div>
+      <div id="main-denom"></div>
+
+      <!-- Set info -->
+      <div id="set-info">1セット目</div>
+
+      <!-- Total volume -->
+      <div id="total-volume">総ボリューム: <span id="volume-val">0 kg</span></div>
+    </div>
+  </div>
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <!-- Row 1: Interval slider -->
+  <div class="footer-row interval-row">
+    <span class="interval-label">インターバル</span>
+    <input type="range" id="slider-interval" min="30" max="180" step="5" value="60">
+    <span id="interval-val">60秒</span>
+  </div>
+
+  <!-- Row 2: Weight + BT + Start -->
+  <div class="footer-row">
+    <button class="weight-btn" id="btn-weight-down">◀</button>
+    <div id="weight-display">20 kg</div>
+    <button class="weight-btn" id="btn-weight-up">▶</button>
+    <div class="footer-spacer"></div>
+    <button class="footer-btn" id="btn-bt">🔵 Bluetooth</button>
+    <button class="footer-btn" id="btn-start">開始</button>
+  </div>
+</footer>
+
+<script>
+// ===== CONSTANTS =====
+const ZONES = [
+  { min: 0,    max: 0.50, color: '#555555', label: '安静' },
+  { min: 0.50, max: 0.60, color: '#0284C7', label: 'リハビリ' },
+  { min: 0.60, max: 0.70, color: '#16A34A', label: '有酸素運動' },
+  { min: 0.70, max: 0.85, color: '#D97706', label: 'トレーニング' },
+  { min: 0.85, max: 1.00, color: '#DC2626', label: 'アスリート' },
+];
+const CX = 280, CY = 308, R_IN = 210, R_OUT = 250;
+const START_DEG = -120, SPAN_DEG = 240;
+const PIVOT_BPM = 100, PIVOT_RATIO = 0.25;
+
+const TEMPO = 33;
+const REPS_PER_MINI = 13;
+const REST_BEATS = 6;
+const MINI_SETS = 4;
+
+// ===== STATE =====
+const S = {
+  running: false,
+  phase: 'idle',
+  miniSet: 1,
+  repCount: 0,
+  restCount: 0,
+  setNum: 1,
+  totalReps: 0,
+  nextBeatTime: 0,
+  timer: null,
+  intervalTimer: null,
+  intervalEndTime: 0,
+  displayTimer: null,
+  weight: 20,
+  interval: 60,
+  hr: 0,
+  peakHR: 0,
+  age: 40,
+  maxHR: 180,
+  btDevice: null,
+};
+
+// ===== AUDIO =====
+let _audioCtx = null;
+
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
+  return _audioCtx;
+}
+
+function playTone(freq, dur, vol = 0.4, type = 'sine') {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type;
+    osc.frequency.value = freq;
+    gain.gain.setValueAtTime(vol, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + dur);
+    osc.start();
+    osc.stop(ctx.currentTime + dur);
+  } catch (_) {}
+}
+
+// ===== TACHOMETER =====
+function degToRad(d) { return d * Math.PI / 180; }
+
+function hrToAngle(hr, maxHR) {
+  if (hr <= PIVOT_BPM) {
+    return START_DEG + (hr / PIVOT_BPM) * PIVOT_RATIO * SPAN_DEG;
+  }
+  const clamped = Math.min(hr, maxHR);
+  return START_DEG + PIVOT_RATIO * SPAN_DEG
+    + ((clamped - PIVOT_BPM) / Math.max(1, maxHR - PIVOT_BPM)) * (1 - PIVOT_RATIO) * SPAN_DEG;
+}
+
+function ratioToAngle(ratio) {
+  return START_DEG + ratio * SPAN_DEG;
+}
+
+function polarToXY(cx, cy, r, deg) {
+  const rad = degToRad(deg);
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function arcPath(cx, cy, rIn, rOut, startDeg, endDeg) {
+  const s1 = polarToXY(cx, cy, rIn, startDeg);
+  const s2 = polarToXY(cx, cy, rOut, startDeg);
+  const e1 = polarToXY(cx, cy, rIn, endDeg);
+  const e2 = polarToXY(cx, cy, rOut, endDeg);
+  const large = (endDeg - startDeg) > 180 ? 1 : 0;
+  return [
+    `M ${s2.x} ${s2.y}`,
+    `A ${rOut} ${rOut} 0 ${large} 1 ${e2.x} ${e2.y}`,
+    `L ${e1.x} ${e1.y}`,
+    `A ${rIn} ${rIn} 0 ${large} 0 ${s1.x} ${s1.y}`,
+    'Z'
+  ].join(' ');
+}
+
+function drawTach(maxHR) {
+  const gArcs   = document.getElementById('g-arcs');
+  const gTicks  = document.getElementById('g-ticks');
+  const gLabels = document.getElementById('g-labels');
+  gArcs.innerHTML = '';
+  gTicks.innerHTML = '';
+  gLabels.innerHTML = '';
+
+  ZONES.forEach(zone => {
+    const startAngle = ratioToAngle(zone.min);
+    const endAngle   = ratioToAngle(zone.max);
+    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+    path.setAttribute('d', arcPath(CX, CY, R_IN, R_OUT, startAngle, endAngle));
+    path.setAttribute('fill', zone.color);
+    path.setAttribute('opacity', '0.85');
+    path.setAttribute('id', 'arc-' + zone.label);
+    gArcs.appendChild(path);
+  });
+
+  const tickBPMs = [];
+  for (let bpm = 0; bpm <= maxHR; bpm += 10) tickBPMs.push(bpm);
+
+  tickBPMs.forEach(bpm => {
+    const angle = hrToAngle(bpm, maxHR);
+    const isMajor = bpm % 20 === 0;
+    const rTickIn  = isMajor ? R_IN - 14 : R_IN - 7;
+    const rTickOut = R_IN - 2;
+    const p1 = polarToXY(CX, CY, rTickIn, angle);
+    const p2 = polarToXY(CX, CY, rTickOut, angle);
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', p1.x); line.setAttribute('y1', p1.y);
+    line.setAttribute('x2', p2.x); line.setAttribute('y2', p2.y);
+    line.setAttribute('stroke', isMajor ? '#aaa' : '#555');
+    line.setAttribute('stroke-width', isMajor ? '2' : '1');
+    gTicks.appendChild(line);
+
+    if (isMajor) {
+      const rLabel = R_IN - 28;
+      const lp = polarToXY(CX, CY, rLabel, angle);
+      const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      text.setAttribute('x', lp.x);
+      text.setAttribute('y', lp.y);
+      text.setAttribute('text-anchor', 'middle');
+      text.setAttribute('dominant-baseline', 'central');
+      text.setAttribute('font-size', '13');
+      text.setAttribute('fill', '#666');
+      text.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
+      text.textContent = bpm;
+      gLabels.appendChild(text);
+    }
+  });
+
+  ZONES.forEach(zone => {
+    if (zone.label === '安静') return;
+    const midRatio = (zone.min + zone.max) / 2;
+    const midAngle = ratioToAngle(midRatio);
+    const rLabel = (R_IN + R_OUT) / 2;
+    const lp = polarToXY(CX, CY, rLabel, midAngle);
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', lp.x);
+    text.setAttribute('y', lp.y);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('dominant-baseline', 'central');
+    text.setAttribute('font-size', '11');
+    text.setAttribute('fill', '#fff');
+    text.setAttribute('font-weight', '600');
+    text.setAttribute('transform', `rotate(${midAngle + 90}, ${lp.x}, ${lp.y})`);
+    text.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
+    text.textContent = zone.label;
+    gLabels.appendChild(text);
+  });
+}
+
+function moveNeedle(hr, maxHR) {
+  const angle = hrToAngle(hr, maxHR);
+  const group = document.getElementById('needle-group');
+  group.setAttribute('transform', `translate(${CX},${CY}) rotate(${angle})`);
+}
+
+function highlightZone(hr, maxHR) {
+  const ratio = hr / maxHR;
+  let currentZone = ZONES[0].label;
+  ZONES.forEach(z => {
+    const el = document.getElementById('arc-' + z.label);
+    if (ratio >= z.min && ratio < z.max) {
+      currentZone = z.label;
+      if (el) el.setAttribute('opacity', '1');
+    } else {
+      if (el) el.setAttribute('opacity', '0.45');
+    }
+  });
+  return currentZone;
+}
+
+// ===== MINI SET DOTS =====
+function buildMiniSetDots() {
+  const container = document.getElementById('mini-set-dots');
+  container.innerHTML = '';
+  for (let i = 0; i < MINI_SETS; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'mini-dot';
+    dot.id = 'mini-dot-' + i;
+    container.appendChild(dot);
+  }
+}
+
+function updateMiniSetDots() {
+  for (let i = 0; i < MINI_SETS; i++) {
+    const dot = document.getElementById('mini-dot-' + i);
+    if (!dot) continue;
+    dot.classList.remove('done', 'current', 'rest', 'interval');
+
+    if (S.phase === 'idle') {
+      // all dark
+    } else if (S.phase === 'interval') {
+      if (i < S.miniSet - 1) {
+        dot.classList.add('done');
+      } else if (i === S.miniSet - 1) {
+        dot.classList.add('current', 'interval');
+      }
+    } else {
+      const currentIndex = S.miniSet - 1;
+      if (i < currentIndex) {
+        dot.classList.add('done');
+      } else if (i === currentIndex) {
+        dot.classList.add('current');
+        if (S.phase === 'rest') dot.classList.add('rest');
+      }
+    }
+  }
+}
+
+// ===== VOLUME =====
+function getTotalVolume() {
+  return S.weight * S.totalReps;
+}
+
+// ===== MAIN NUMBER FLASH =====
+let _flashTimer = null;
+function flashMain() {
+  const el = document.getElementById('main-number');
+  el.classList.add('flash');
+  if (_flashTimer) clearTimeout(_flashTimer);
+  _flashTimer = setTimeout(() => el.classList.remove('flash'), 70);
+}
+
+// ===== UPDATE DISPLAY =====
+function updateDisplay() {
+  const card = document.getElementById('strength-card');
+  const phaseLabel = document.getElementById('phase-label');
+  const mainNumber = document.getElementById('main-number');
+  const mainDenom  = document.getElementById('main-denom');
+  const setInfo    = document.getElementById('set-info');
+  const volumeVal  = document.getElementById('volume-val');
+
+  // Card border
+  card.classList.remove('phase-rep', 'phase-rest', 'phase-interval');
+  if (S.phase === 'rep')      card.classList.add('phase-rep');
+  if (S.phase === 'rest')     card.classList.add('phase-rest');
+  if (S.phase === 'interval') card.classList.add('phase-interval');
+
+  // Phase label
+  phaseLabel.classList.remove('rep', 'rest', 'interval', 'idle');
+  if (S.phase === 'rep') {
+    phaseLabel.textContent = '全力！';
+    phaseLabel.classList.add('rep');
+  } else if (S.phase === 'rest') {
+    phaseLabel.textContent = '小休止';
+    phaseLabel.classList.add('rest');
+  } else if (S.phase === 'interval') {
+    phaseLabel.textContent = 'インターバル';
+    phaseLabel.classList.add('interval');
+  } else {
+    phaseLabel.textContent = 'スタート待ち';
+    phaseLabel.classList.add('idle');
+  }
+
+  // Main number
+  if (S.phase === 'rep') {
+    mainNumber.textContent = S.repCount;
+    mainDenom.textContent = '/ ' + REPS_PER_MINI;
+  } else if (S.phase === 'rest') {
+    mainNumber.textContent = S.restCount;
+    mainDenom.textContent = '/ ' + REST_BEATS;
+  } else if (S.phase === 'interval') {
+    const remaining = Math.max(0, Math.ceil((S.intervalEndTime - Date.now()) / 1000));
+    mainNumber.textContent = remaining;
+    mainDenom.textContent = '秒';
+  } else {
+    mainNumber.textContent = '--';
+    mainDenom.textContent = '';
+  }
+
+  // Set info
+  setInfo.textContent = S.setNum + 'セット目';
+
+  // Volume
+  const vol = getTotalVolume();
+  volumeVal.textContent = vol.toLocaleString() + ' kg';
+
+  // Mini set dots
+  updateMiniSetDots();
+}
+
+// ===== BEAT LOGIC =====
+function onBeat() {
+  if (S.phase === 'rep') {
+    S.repCount++;
+    S.totalReps++;
+    playTone(880, 0.06, 0.35);
+    flashMain();
+    if (S.repCount >= REPS_PER_MINI) {
+      S.repCount = 0;
+      if (S.miniSet >= MINI_SETS) {
+        startInterval();
+        return;
+      } else {
+        S.phase = 'rest';
+        S.restCount = 0;
+        playTone(660, 0.2, 0.4);
+      }
+    }
+  } else if (S.phase === 'rest') {
+    S.restCount++;
+    playTone(440, 0.06, 0.2);
+    if (S.restCount >= REST_BEATS) {
+      S.miniSet++;
+      S.phase = 'rep';
+      S.restCount = 0;
+      playTone(1100, 0.1, 0.5);
+    }
+  }
+  updateDisplay();
+}
+
+function tick() {
+  if (!S.running) return;
+  if (Date.now() >= S.nextBeatTime - 5) {
+    onBeat();
+    S.nextBeatTime += 60000 / TEMPO;
+  }
+  S.timer = setTimeout(tick, Math.max(1, Math.min(S.nextBeatTime - Date.now(), 16)));
+}
+
+// ===== INTERVAL =====
+function startInterval() {
+  S.phase = 'interval';
+  clearTimeout(S.timer);
+  S.intervalEndTime = Date.now() + S.interval * 1000;
+  S.intervalTimer = setTimeout(endInterval, S.interval * 1000);
+  playTone(440, 0.4, 0.4);
+  tickIntervalDisplay();
+  updateDisplay();
+}
+
+function endInterval() {
+  S.setNum++;
+  S.miniSet = 1;
+  S.repCount = 0;
+  S.restCount = 0;
+  S.phase = 'rep';
+  S.nextBeatTime = Date.now();
+  playTone(1100, 0.12, 0.5);
+  tick();
+  updateDisplay();
+}
+
+function tickIntervalDisplay() {
+  if (S.phase !== 'interval') return;
+  updateDisplay();
+  S.displayTimer = setTimeout(tickIntervalDisplay, 500);
+}
+
+// ===== START / STOP =====
+function startTraining() {
+  S.running = true;
+  S.phase = 'rep';
+  S.miniSet = 1;
+  S.repCount = 0;
+  S.restCount = 0;
+  S.setNum = 1;
+  S.totalReps = 0;
+  S.nextBeatTime = Date.now();
+
+  document.getElementById('btn-start').textContent = '停止';
+  document.getElementById('btn-start').classList.add('stop');
+  updateDisplay();
+  tick();
+}
+
+function stopTraining() {
+  S.running = false;
+  clearTimeout(S.timer);
+  clearTimeout(S.intervalTimer);
+  clearTimeout(S.displayTimer);
+  S.timer = null;
+  S.intervalTimer = null;
+  S.displayTimer = null;
+  S.phase = 'idle';
+
+  document.getElementById('btn-start').textContent = '開始';
+  document.getElementById('btn-start').classList.remove('stop');
+  updateDisplay();
+}
+
+// ===== BLUETOOTH =====
+async function connectBT() {
+  if (S.btDevice) {
+    try { S.btDevice.gatt.disconnect(); } catch (_) {}
+    S.btDevice = null;
+    document.getElementById('btn-bt').textContent = '🔵 Bluetooth';
+    document.getElementById('btn-bt').classList.remove('ok');
+    return;
+  }
+  try {
+    const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: ['heart_rate'] }] });
+    dev.addEventListener('gattserverdisconnected', () => {
+      S.btDevice = null;
+      document.getElementById('btn-bt').textContent = '🔵 Bluetooth';
+      document.getElementById('btn-bt').classList.remove('ok');
+    });
+    const server = await dev.gatt.connect();
+    const svc = await server.getPrimaryService('heart_rate');
+    const chr = await svc.getCharacteristic('heart_rate_measurement');
+    await chr.startNotifications();
+    chr.addEventListener('characteristicvaluechanged', onHR);
+    S.btDevice = dev;
+    document.getElementById('btn-bt').textContent = '💚 接続済み';
+    document.getElementById('btn-bt').classList.add('ok');
+  } catch (e) {
+    if (e.name !== 'NotFoundError') alert('Bluetooth接続エラー: ' + e.message);
+  }
+}
+
+function onHR(e) {
+  const v = e.target.value;
+  const fl = v.getUint8(0);
+  const hr = (fl & 0x01) ? v.getUint16(1, true) : v.getUint8(1);
+  S.hr = hr;
+  if (hr > S.peakHR) S.peakHR = hr;
+  document.getElementById('t-hr').textContent = hr;
+  moveNeedle(hr, S.maxHR);
+  const zName = highlightZone(hr, S.maxHR);
+  const zObj = ZONES.find(z => z.label === zName);
+  document.getElementById('t-zone').textContent = zName;
+  document.getElementById('t-zone').setAttribute('fill', zObj?.color || '#666');
+}
+
+// ===== WEIGHT CONTROL =====
+function setWeight(w) {
+  const clamped = Math.max(5, Math.min(90, Math.round(w / 5) * 5));
+  S.weight = clamped;
+  document.getElementById('weight-display').textContent = clamped + ' kg';
+  updateDisplay();
+}
+
+// ===== CLOCK =====
+function updateClock() {
+  const now = new Date();
+  const h   = String(now.getHours()).padStart(2, '0');
+  const m   = String(now.getMinutes()).padStart(2, '0');
+  const sec = String(now.getSeconds()).padStart(2, '0');
+  document.getElementById('clock').textContent = `${h}:${m}:${sec}`;
+}
+
+// ===== INIT =====
+function init() {
+  drawTach(S.maxHR);
+  buildMiniSetDots();
+  updateDisplay();
+  updateClock();
+  setInterval(updateClock, 1000);
+
+  // Start/Stop
+  document.getElementById('btn-start').addEventListener('click', () => {
+    getAudioCtx();
+    if (S.running || S.phase === 'interval') {
+      stopTraining();
+    } else {
+      startTraining();
+    }
+  });
+
+  // Bluetooth
+  document.getElementById('btn-bt').addEventListener('click', connectBT);
+
+  // Interval slider
+  const sliderInterval = document.getElementById('slider-interval');
+  const intervalVal    = document.getElementById('interval-val');
+  sliderInterval.addEventListener('input', () => {
+    S.interval = parseInt(sliderInterval.value, 10);
+    intervalVal.textContent = S.interval + '秒';
+  });
+
+  // Weight buttons
+  document.getElementById('btn-weight-down').addEventListener('click', () => {
+    setWeight(S.weight - 5);
+  });
+  document.getElementById('btn-weight-up').addEventListener('click', () => {
+    setWeight(S.weight + 5);
+  });
+
+  // Fullscreen
+  document.getElementById('btn-fullscreen').addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
