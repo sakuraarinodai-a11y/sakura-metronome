@@ -540,29 +540,33 @@ function updateHRBar(hr, maxHR) {
 }
 
 // ===== METRONOME ANIMATION =====
-let _pendulumAnim = null;
+// ビートごとに方向を明示指定して alternate に依存しない
+let _pendulumAnim  = null;
+let _pendulumAngle = -26; // 現在の停止角度
+let _pendulumDir   = 1;   // 次に向かう方向 (+1=右, -1=左)
 
-function updatePendulumSpeed(bpm) {
+function swingPendulum(bpm) {
   if (bpm <= 0) return;
-  const halfPeriodMs = (60 / bpm) * 1000; // 片道（ms）
-  if (_pendulumAnim) {
-    // 位相を保ったまま速度だけ変更
-    _pendulumAnim.effect.updateTiming({ duration: halfPeriodMs });
-  } else {
-    const group = document.getElementById('pendulum-group');
-    _pendulumAnim = group.animate(
-      [
-        { transform: 'rotate(-26deg)' },
-        { transform: 'rotate(26deg)' },
-      ],
-      {
-        duration: halfPeriodMs,
-        easing: 'cubic-bezier(0.45, 0.05, 0.55, 0.95)',
-        direction: 'alternate',
-        iterations: Infinity,
-      }
-    );
-  }
+  const group      = document.getElementById('pendulum-group');
+  const durationMs = (60 / bpm) * 1000;
+
+  const from = _pendulumAngle;
+  _pendulumDir  *= -1;
+  const to       = 26 * _pendulumDir;
+  _pendulumAngle = to;
+
+  if (_pendulumAnim) _pendulumAnim.cancel();
+  _pendulumAnim = group.animate(
+    [
+      { transform: `rotate(${from}deg)` },
+      { transform: `rotate(${to}deg)` },
+    ],
+    {
+      duration: durationMs,
+      easing: 'cubic-bezier(0.45, 0.05, 0.55, 0.95)',
+      fill: 'forwards',
+    }
+  );
 }
 
 // ===== BEAT DOTS =====
@@ -613,6 +617,8 @@ function onBeat() {
   S.beatInLevel++;
   S.totalBeats++;
 
+  swingPendulum(S.bpm); // ビートのたびに方向を明示して振り子を動かす
+
   const isAccent  = (S.beatInLevel === 1);
   const isLevelUp = (S.beatInLevel > BEATS_PER_LEVEL);
 
@@ -631,7 +637,6 @@ function onBeat() {
     document.getElementById('bpm-value').textContent = S.bpm;
     updateProgress();
     updateBeatDots(1);
-    updatePendulumSpeed(S.bpm);
   } else {
     if (isAccent) {
       playTone(1200, 0.07, 0.5, 'sine');
@@ -668,7 +673,6 @@ function startMetronome() {
   document.getElementById('btn-start').classList.add('stop');
   updateBeatDots(0);
   updateProgress();
-  updatePendulumSpeed(S.bpm);
   tick();
 }
 
@@ -762,7 +766,7 @@ function init() {
   buildBeatDots();
   updateClock();
   setInterval(updateClock, 1000);
-  updatePendulumSpeed(75); // 起動時からデフォルト速度で振り子を開始
+  swingPendulum(75); // 起動時に振り子を初期位置へ
 
   PRESETS.forEach((preset, idx) => {
     const btn = document.getElementById('btn-preset-' + idx);
