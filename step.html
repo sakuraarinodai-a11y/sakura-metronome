@@ -736,7 +736,13 @@
         <g id="hr-ticks"></g>
         <!-- ポインター（心拍数位置インジケーター） -->
         <g id="hr-pointer-group" opacity="0">
-          <line x1="0" y1="14" x2="0" y2="52" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <!-- 現在BPM値ラベル（ポインター上部） -->
+          <rect id="hr-ptr-bg" x="-22" y="0" width="44" height="18" rx="4" fill="#111" opacity="0.88"/>
+          <text id="hr-ptr-val" x="0" y="13" text-anchor="middle"
+                font-size="13" font-weight="900" fill="white"
+                font-family="'Helvetica Neue',Arial,sans-serif"
+                font-variant-numeric="tabular-nums">--</text>
+          <line x1="0" y1="20" x2="0" y2="52" stroke="white" stroke-width="3" stroke-linecap="round"/>
           <polygon points="-8,52 8,52 0,64" fill="white"/>
         </g>
       </svg>
@@ -1113,6 +1119,7 @@ function updateHRBar(hr, maxHR) {
     }
   });
 
+  document.getElementById('hr-ptr-val').textContent     = hr;
   document.getElementById('hr-value-display').textContent = hr;
   const zLabel = document.getElementById('hr-zone-label');
   zLabel.textContent = currentZone.label;
