@@ -26,28 +26,13 @@
     border-bottom: 1px solid #1a1a1a;
     background: #0d0d0d;
   }
-  .header-title {
-    font-size: 20px;
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    color: #e8c4b8;
-  }
+  .header-title { font-size: 20px; font-weight: 700; letter-spacing: 0.05em; color: #e8c4b8; }
   .header-right { display: flex; align-items: center; gap: 14px; }
-  #clock {
-    font-size: 22px;
-    font-weight: 600;
-    font-variant-numeric: tabular-nums;
-    color: #aaa;
-  }
+  #clock { font-size: 22px; font-weight: 600; font-variant-numeric: tabular-nums; color: #aaa; }
   #btn-fullscreen {
-    background: #1a1a1a;
-    border: 1px solid #333;
-    color: #aaa;
-    font-size: 18px;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.15s;
+    background: #1a1a1a; border: 1px solid #333; color: #aaa;
+    font-size: 18px; padding: 6px 10px; border-radius: 6px;
+    cursor: pointer; transition: background 0.15s;
   }
   #btn-fullscreen:hover { background: #252525; }
 
@@ -67,25 +52,21 @@
     border-right: 1px solid #1a1a1a;
     background: #0b0b0b;
     padding: 16px;
-    gap: 12px;
+    gap: 16px;
+    position: relative;
   }
   #bench-video {
     width: 100%;
-    max-width: 480px;
+    max-width: 520px;
     height: auto;
-    display: none;
-    mix-blend-mode: screen;   /* 黒背景を透過させる */
-  }
-  #bench-svg {
-    width: 100%;
-    max-width: 480px;
-    height: auto;
+    border-radius: 12px;
+    mix-blend-mode: screen;
   }
   #bench-phase-label {
-    font-size: clamp(22px, 3vw, 38px);
+    font-size: clamp(24px, 3vw, 40px);
     font-weight: 900;
     letter-spacing: 0.04em;
-    min-height: 48px;
+    min-height: 52px;
     text-align: center;
   }
   #bench-phase-label.rest     { color: #22C55E; }
@@ -122,10 +103,8 @@
   /* Mini set dots */
   .mini-set-dots { display: flex; gap: 12px; align-items: center; }
   .mini-dot {
-    width: 18px; height: 18px;
-    border-radius: 50%;
-    background: #1e1e1e;
-    border: 2px solid #333;
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #1e1e1e; border: 2px solid #333;
     transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
   }
   .mini-dot.done      { background: #22C55E; border-color: #22C55E; box-shadow: 0 0 8px #22C55E55; }
@@ -137,28 +116,21 @@
   /* Numbers */
   #main-number {
     font-size: clamp(72px, 10vw, 110px);
-    font-weight: 900;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    letter-spacing: -3px;
-    text-align: center;
-    color: #fff;
-    min-height: 100px;
+    font-weight: 900; font-variant-numeric: tabular-nums;
+    line-height: 1; letter-spacing: -3px;
+    text-align: center; color: #fff; min-height: 100px;
   }
   #main-number.flash { color: #e8c4b8; }
-  #main-denom  { font-size: 28px; color: #555; font-weight: 500; min-height: 36px; }
-  #set-info    { font-size: 22px; font-weight: 700; color: #aaa; }
+  #main-denom   { font-size: 28px; color: #555; font-weight: 500; min-height: 36px; }
+  #set-info     { font-size: 22px; font-weight: 700; color: #aaa; }
   #total-volume { font-size: 16px; color: #555; }
   #total-volume span { color: #e8c4b8; font-weight: 700; }
 
   /* ===== FOOTER ===== */
   footer {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+    display: flex; flex-direction: column; gap: 8px;
     padding: 10px 24px 12px;
-    border-top: 1px solid #1a1a1a;
-    background: #0d0d0d;
+    border-top: 1px solid #1a1a1a; background: #0d0d0d;
   }
   .footer-row { display: flex; align-items: center; gap: 12px; width: 100%; }
   .footer-spacer { flex: 1; }
@@ -166,19 +138,14 @@
   /* Interval slider */
   .interval-label { font-size: 14px; color: #666; white-space: nowrap; min-width: 80px; }
   #slider-interval {
-    flex: 1;
-    -webkit-appearance: none; appearance: none;
-    height: 6px; border-radius: 3px;
-    background: #2a2a2a; outline: none; cursor: pointer;
+    flex: 1; -webkit-appearance: none; appearance: none;
+    height: 6px; border-radius: 3px; background: #2a2a2a; outline: none; cursor: pointer;
   }
   #slider-interval::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 18px; height: 18px; border-radius: 50%;
-    background: #3B82F6; cursor: pointer;
+    -webkit-appearance: none; width: 18px; height: 18px; border-radius: 50%; background: #3B82F6; cursor: pointer;
   }
   #slider-interval::-moz-range-thumb {
-    width: 18px; height: 18px; border-radius: 50%;
-    background: #3B82F6; cursor: pointer; border: none;
+    width: 18px; height: 18px; border-radius: 50%; background: #3B82F6; cursor: pointer; border: none;
   }
   #interval-val { font-size: 15px; color: #aaa; font-variant-numeric: tabular-nums; min-width: 50px; text-align: right; }
 
@@ -217,214 +184,12 @@
 
 <!-- MAIN -->
 <main>
-  <!-- Bench Press Animation Panel -->
+  <!-- Bench Press Video Panel -->
   <div class="bench-panel">
-    <!-- Video mode: shown when bench.mp4 or bench.webm is available -->
     <video id="bench-video" muted playsinline preload="auto">
       <source src="bench.mp4"  type="video/mp4">
       <source src="bench.webm" type="video/webm">
     </video>
-
-    <!-- SVG fallback (detailed illustration) -->
-    <svg id="bench-svg" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <!-- Skin gradients -->
-        <linearGradient id="skin-torso" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#ddb898"/>
-          <stop offset="100%" stop-color="#c08868"/>
-        </linearGradient>
-        <radialGradient id="skin-head" cx="38%" cy="35%" r="62%">
-          <stop offset="0%"   stop-color="#f0c8a8"/>
-          <stop offset="100%" stop-color="#c08060"/>
-        </radialGradient>
-        <linearGradient id="skin-arm" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stop-color="#d4a880"/>
-          <stop offset="50%"  stop-color="#e8c098"/>
-          <stop offset="100%" stop-color="#c89068"/>
-        </linearGradient>
-        <!-- Bench -->
-        <linearGradient id="bench-surf" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#3e3e3e"/>
-          <stop offset="35%"  stop-color="#2a2a2a"/>
-          <stop offset="100%" stop-color="#161616"/>
-        </linearGradient>
-        <!-- Bar -->
-        <linearGradient id="bar-metal" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%"   stop-color="#e8e8e8"/>
-          <stop offset="45%"  stop-color="#b8b8b8"/>
-          <stop offset="100%" stop-color="#787878"/>
-        </linearGradient>
-        <!-- Plates -->
-        <linearGradient id="plate-dark" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stop-color="#181818"/>
-          <stop offset="50%"  stop-color="#484848"/>
-          <stop offset="100%" stop-color="#181818"/>
-        </linearGradient>
-        <linearGradient id="plate-red" x1="0" y1="0" x2="1" y2="0">
-          <stop offset="0%"   stop-color="#8a1428"/>
-          <stop offset="50%"  stop-color="#d43050"/>
-          <stop offset="100%" stop-color="#8a1428"/>
-        </linearGradient>
-        <!-- Filters -->
-        <filter id="bar-glow" x="-20%" y="-200%" width="140%" height="500%">
-          <feGaussianBlur stdDeviation="3" result="blur"/>
-          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-        </filter>
-        <filter id="soft-shadow" x="-5%" y="-15%" width="110%" height="140%">
-          <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#000" flood-opacity="0.65"/>
-        </filter>
-        <filter id="torso-shadow" x="-5%" y="-15%" width="110%" height="140%">
-          <feDropShadow dx="2" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.7"/>
-        </filter>
-      </defs>
-
-      <!-- Floor shadow -->
-      <ellipse cx="240" cy="280" rx="185" ry="12" fill="#000" opacity="0.5"/>
-
-      <!-- Bench legs -->
-      <rect x="145" y="221" width="14" height="56" rx="5" fill="#1a1a1a"/>
-      <rect x="321" y="221" width="14" height="56" rx="5" fill="#1a1a1a"/>
-      <!-- Leg brace -->
-      <rect x="145" y="254" width="190" height="7" rx="3" fill="#141414"/>
-      <!-- Leg feet -->
-      <rect x="133" y="270" width="38" height="7" rx="3" fill="#111"/>
-      <rect x="309" y="270" width="38" height="7" rx="3" fill="#111"/>
-
-      <!-- Bench cushion -->
-      <rect x="106" y="202" width="268" height="24" rx="9" fill="url(#bench-surf)" filter="url(#soft-shadow)"/>
-      <!-- Cushion top highlight -->
-      <rect x="112" y="203" width="256" height="8" rx="5" fill="#505050" opacity="0.5"/>
-      <!-- Cushion seam -->
-      <line x1="240" y1="204" x2="240" y2="224" stroke="#1a1a1a" stroke-width="1.5" opacity="0.8"/>
-
-      <!-- Person: legs / feet (toward left) -->
-      <path d="M 148 224 C 135 232, 114 240, 102 247"
-            stroke="#c8a070" stroke-width="20" fill="none" stroke-linecap="round"/>
-      <path d="M 168 224 C 156 234, 138 244, 126 250"
-            stroke="#c8a070" stroke-width="20" fill="none" stroke-linecap="round"/>
-      <!-- Shoes -->
-      <ellipse cx="97"  cy="249" rx="19" ry="10" fill="#252525" transform="rotate(-12,97,249)"/>
-      <ellipse cx="121" cy="252" rx="19" ry="10" fill="#252525" transform="rotate(-6,121,252)"/>
-      <!-- Shoe sole highlight -->
-      <ellipse cx="97"  cy="247" rx="14" ry="5" fill="#333" opacity="0.7" transform="rotate(-12,97,247)"/>
-      <ellipse cx="121" cy="250" rx="14" ry="5" fill="#333" opacity="0.7" transform="rotate(-6,121,250)"/>
-
-      <!-- Torso (main shape) -->
-      <path d="M 150 192
-               C 154 180, 198 181, 240 181
-               C 282 181, 326 180, 330 192
-               C 334 202, 328 216, 290 218
-               C 270 220, 210 220, 190 218
-               C 162 216, 147 202, 150 192 Z"
-            fill="url(#skin-torso)" filter="url(#torso-shadow)"/>
-
-      <!-- Pectoral muscles -->
-      <path d="M 183 194 C 208 188, 232 192, 240 197 C 228 207, 198 210, 176 208 C 165 206, 165 197, 183 194 Z"
-            fill="#be9870" opacity="0.4"/>
-      <path d="M 297 194 C 272 188, 248 192, 240 197 C 252 207, 282 210, 304 208 C 315 206, 315 197, 297 194 Z"
-            fill="#be9870" opacity="0.4"/>
-      <!-- Pec inner shadow for definition -->
-      <path d="M 210 197 C 224 194, 240 197, 240 197 C 224 202, 208 204, 204 201 Z"
-            fill="#9a7050" opacity="0.3"/>
-      <path d="M 270 197 C 256 194, 240 197, 240 197 C 256 202, 272 204, 276 201 Z"
-            fill="#9a7050" opacity="0.3"/>
-      <!-- Sternum line -->
-      <line x1="240" y1="182" x2="240" y2="216" stroke="#a07050" stroke-width="2" opacity="0.45"/>
-      <!-- Abs (subtle) -->
-      <ellipse cx="220" cy="210" rx="14" ry="5" fill="#a87850" opacity="0.2"/>
-      <ellipse cx="260" cy="210" rx="14" ry="5" fill="#a87850" opacity="0.2"/>
-
-      <!-- Neck -->
-      <path d="M 326 190 C 330 180, 346 176, 356 178 C 364 181, 364 200, 352 204 C 340 207, 324 202, 326 190 Z"
-            fill="#d0a880"/>
-
-      <!-- Head -->
-      <circle cx="370" cy="171" r="26" fill="url(#skin-head)" filter="url(#soft-shadow)"/>
-      <!-- Hair -->
-      <path d="M 347 157 C 352 142, 374 138, 388 144 C 396 149, 397 158, 394 164
-               C 390 155, 370 150, 352 158 Z" fill="#28180a"/>
-      <!-- Ear -->
-      <ellipse cx="345" cy="173" rx="6" ry="8" fill="#c89068"/>
-      <!-- Eye -->
-      <ellipse cx="378" cy="168" rx="3.5" ry="3" fill="#180e06"/>
-      <circle cx="379" cy="167" r="1.2" fill="#fff" opacity="0.65"/>
-      <!-- Brow -->
-      <path d="M 373 163 Q 379 161, 384 163" stroke="#5a3a20" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-      <!-- Nose -->
-      <path d="M 383 170 Q 387 174, 384 176" stroke="#b08060" stroke-width="1.4" fill="none" stroke-linecap="round"/>
-      <!-- Mouth (effort grimace) -->
-      <path d="M 366 179 Q 374 183, 381 179" stroke="#9a6040" stroke-width="2" fill="none" stroke-linecap="round"/>
-
-      <!-- LEFT ARM -->
-      <line id="arm-l" x1="183" y1="188" x2="108" y2="108"
-            stroke="#d0a878" stroke-width="17" stroke-linecap="round"/>
-      <!-- Arm shading highlight (bicep) -->
-      <line x1="183" y1="185" x2="160" y2="148"
-            stroke="#e8c898" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
-      <!-- Forearm vein hint -->
-      <line x1="150" y1="162" x2="125" y2="140"
-            stroke="#a08060" stroke-width="2" stroke-linecap="round" opacity="0.25"/>
-
-      <!-- RIGHT ARM -->
-      <line id="arm-r" x1="297" y1="188" x2="372" y2="108"
-            stroke="#d0a878" stroke-width="17" stroke-linecap="round"/>
-      <!-- Arm highlight -->
-      <line x1="297" y1="185" x2="320" y2="148"
-            stroke="#e8c898" stroke-width="6" stroke-linecap="round" opacity="0.3"/>
-
-      <!-- BARBELL GROUP — entire unit translates together -->
-      <g id="bb-group" transform="translate(0,0)">
-        <!-- Bar shadow -->
-        <rect x="62" y="112" width="356" height="6" rx="3" fill="#000" opacity="0.4"/>
-        <!-- Bar -->
-        <rect x="62" y="104" width="356" height="9" rx="3"
-              fill="url(#bar-metal)" filter="url(#bar-glow)"/>
-        <!-- Bar top highlight -->
-        <rect x="62" y="104" width="356" height="3" rx="2" fill="#fff" opacity="0.25"/>
-        <!-- Knurling marks -->
-        <line x1="108" y1="105" x2="108" y2="112" stroke="#999" stroke-width="1.3" opacity="0.55"/>
-        <line x1="115" y1="105" x2="115" y2="112" stroke="#999" stroke-width="1.3" opacity="0.55"/>
-        <line x1="122" y1="105" x2="122" y2="112" stroke="#999" stroke-width="1.3" opacity="0.55"/>
-        <line x1="129" y1="105" x2="129" y2="112" stroke="#999" stroke-width="1.3" opacity="0.55"/>
-        <line x1="351" y1="105" x2="351" y2="112" stroke="#999" stroke-width="1.3" opacity="0.55"/>
-        <line x1="358" y1="105" x2="358" y2="112" stroke="#999" stroke-width="1.3" opacity="0.55"/>
-        <line x1="365" y1="105" x2="365" y2="112" stroke="#999" stroke-width="1.3" opacity="0.55"/>
-        <line x1="372" y1="105" x2="372" y2="112" stroke="#999" stroke-width="1.3" opacity="0.55"/>
-
-        <!-- Large plates -->
-        <ellipse id="bb-pl-big" cx="74" cy="108" rx="12" ry="31" fill="url(#plate-dark)"/>
-        <ellipse cx="74" cy="108" rx="8"  ry="22" fill="none" stroke="#555" stroke-width="1.2"/>
-        <ellipse cx="74" cy="108" rx="4"  ry="11" fill="#0a0a0a"/>
-        <ellipse cx="74" cy="108" rx="1.5" ry="4" fill="#333"/>
-
-        <ellipse id="bb-pr-big" cx="406" cy="108" rx="12" ry="31" fill="url(#plate-dark)"/>
-        <ellipse cx="406" cy="108" rx="8"  ry="22" fill="none" stroke="#555" stroke-width="1.2"/>
-        <ellipse cx="406" cy="108" rx="4"  ry="11" fill="#0a0a0a"/>
-        <ellipse cx="406" cy="108" rx="1.5" ry="4" fill="#333"/>
-
-        <!-- Small plates (red accent) -->
-        <ellipse id="bb-pl-sml" cx="90"  cy="108" rx="8" ry="21" fill="url(#plate-red)"/>
-        <ellipse cx="90"  cy="108" rx="3" ry="8" fill="#6a0e1e" opacity="0.6"/>
-        <ellipse id="bb-pr-sml" cx="390" cy="108" rx="8" ry="21" fill="url(#plate-red)"/>
-        <ellipse cx="390" cy="108" rx="3" ry="8" fill="#6a0e1e" opacity="0.6"/>
-
-        <!-- Collars -->
-        <rect id="bb-collar-l" x="98"  y="101" width="9" height="15" rx="2" fill="#c8c8c8"/>
-        <rect id="bb-collar-r" x="373" y="101" width="9" height="15" rx="2" fill="#c8c8c8"/>
-        <!-- Collar bolts -->
-        <circle cx="102" cy="108" r="2" fill="#888"/>
-        <circle cx="377" cy="108" r="2" fill="#888"/>
-      </g>
-
-      <!-- Wrists / hands (drawn above bar) -->
-      <circle id="wrist-l" cx="108" cy="108" r="9" fill="#c8a070"/>
-      <circle id="wrist-r" cx="372" cy="108" r="9" fill="#c8a070"/>
-      <!-- Thumb wraps around bar -->
-      <circle cx="108" cy="108" r="5" fill="#b89060" opacity="0.7"/>
-      <circle cx="372" cy="108" r="5" fill="#b89060" opacity="0.7"/>
-    </svg>
-
-    <!-- Phase label shown in bench panel -->
     <div id="bench-phase-label" class="idle">スタート待ち</div>
   </div>
 
@@ -463,9 +228,6 @@ const REPS_PER_MINI = 13;
 const REST_BEATS    = 6;
 const MINI_SETS     = 4;
 
-const BB_Y_UP   = 108;  // barbell at top (arms extended)
-const BB_Y_DOWN = 180;  // barbell on chest
-
 // ===== STATE =====
 const S = {
   running: false,
@@ -495,8 +257,8 @@ function getAudioCtx() {
 
 function playTone(freq, dur, vol = 0.4) {
   try {
-    const ctx = getAudioCtx();
-    const osc = ctx.createOscillator();
+    const ctx  = getAudioCtx();
+    const osc  = ctx.createOscillator();
     const gain = ctx.createGain();
     osc.connect(gain);
     gain.connect(ctx.destination);
@@ -509,61 +271,22 @@ function playTone(freq, dur, vol = 0.4) {
   } catch (_) {}
 }
 
-// ===== BENCH PRESS ANIMATION =====
-let _benchAnimId = null;
-let _useVideo    = false;
+// ===== VIDEO CONTROL =====
+// 動画(27秒・13回)をミニセット開始時に再生し、13回完了で停止
+// playbackRate = 動画尺 ÷ 1ミニセット所要時間 で自動同期
 
-function easeInOut(t) {
-  return 0.5 - 0.5 * Math.cos(t * Math.PI);
+function startRepVideo() {
+  const video = document.getElementById('bench-video');
+  if (!video.duration) return;
+  const miniSetDuration = REPS_PER_MINI * (60 / TEMPO);   // 約23.6秒
+  video.playbackRate = Math.min(video.duration / miniSetDuration, 15.9);
+  video.currentTime  = 0;
+  video.play().catch(() => {});
 }
 
-function updateBenchPose(barbellY) {
-  // Translate entire barbell group as one unit
-  const delta = barbellY - BB_Y_UP;
-  document.getElementById('bb-group').setAttribute('transform', `translate(0,${delta})`);
-  // Move arms to match barbell
-  document.getElementById('arm-l').setAttribute('y2', barbellY);
-  document.getElementById('arm-r').setAttribute('y2', barbellY);
-  // Move wrists
-  document.getElementById('wrist-l').setAttribute('cy', barbellY);
-  document.getElementById('wrist-r').setAttribute('cy', barbellY);
-}
-
-function triggerRepAnim() {
-  if (_useVideo) {
-    const video = document.getElementById('bench-video');
-    if (video.duration) {
-      video.playbackRate = video.duration / (60 / TEMPO);
-    }
-    video.currentTime = 0;
-    video.play().catch(() => {});
-    return;
-  }
-  // SVG animation
-  if (_benchAnimId) cancelAnimationFrame(_benchAnimId);
-  const beatMs    = 60000 / TEMPO;
-  const startTime = performance.now();
-  function frame(now) {
-    const t = Math.min((now - startTime) / beatMs, 1);
-    // 0→0.4: lower, 0.4→0.6: hold bottom, 0.6→1.0: press up
-    let p;
-    if      (t < 0.4) p = easeInOut(t / 0.4);
-    else if (t < 0.6) p = 1;
-    else              p = 1 - easeInOut((t - 0.6) / 0.4);
-    updateBenchPose(BB_Y_UP + (BB_Y_DOWN - BB_Y_UP) * p);
-    if (t < 1) {
-      _benchAnimId = requestAnimationFrame(frame);
-    } else {
-      updateBenchPose(BB_Y_UP);
-      _benchAnimId = null;
-    }
-  }
-  _benchAnimId = requestAnimationFrame(frame);
-}
-
-function stopBenchAnim() {
-  if (_benchAnimId) { cancelAnimationFrame(_benchAnimId); _benchAnimId = null; }
-  updateBenchPose(BB_Y_UP);
+function pauseRepVideo() {
+  const video = document.getElementById('bench-video');
+  video.pause();
 }
 
 // ===== MINI SET DOTS =====
@@ -583,15 +306,14 @@ function updateMiniSetDots() {
     const dot = document.getElementById('mini-dot-' + i);
     if (!dot) continue;
     dot.classList.remove('done', 'current', 'rest', 'interval');
-
     if (S.phase === 'idle') {
       // all dark
     } else if (S.phase === 'interval') {
-      if (i < S.miniSet - 1) dot.classList.add('done');
+      if (i < S.miniSet - 1)      dot.classList.add('done');
       else if (i === S.miniSet - 1) dot.classList.add('current', 'interval');
     } else {
       const ci = S.miniSet - 1;
-      if (i < ci) dot.classList.add('done');
+      if (i < ci)      dot.classList.add('done');
       else if (i === ci) {
         dot.classList.add('current');
         if (S.phase === 'rest') dot.classList.add('rest');
@@ -652,29 +374,28 @@ function updateDisplay() {
     mainDenom.textContent  = '';
   }
 
-  setInfo.textContent    = S.setNum + 'セット目';
-  volumeVal.textContent  = (S.weight * S.totalReps).toLocaleString() + ' kg';
+  setInfo.textContent   = S.setNum + 'セット目';
+  volumeVal.textContent = (S.weight * S.totalReps).toLocaleString() + ' kg';
   updateMiniSetDots();
 }
 
 // ===== BEAT LOGIC =====
-// Set structure: mini-set1(13rep→6rest) × 3 → mini-set4(13rep→interval) = 1セット
+// セット構成: 13回rep → 6拍rest × 3回 → 13回rep → インターバル = 1セット
 function onBeat() {
   if (S.phase === 'rep') {
     S.repCount++;
     S.totalReps++;
-    triggerRepAnim();
     playTone(880, 0.06, 0.35);
     flashMain();
     if (S.repCount >= REPS_PER_MINI) {
       S.repCount = 0;
+      pauseRepVideo();
       if (S.miniSet >= MINI_SETS) {
         startInterval();
         return;
       } else {
-        S.phase = 'rest';
+        S.phase     = 'rest';
         S.restCount = 0;
-        updateBenchPose(BB_Y_DOWN);
         playTone(660, 0.2, 0.4);
       }
     }
@@ -683,8 +404,9 @@ function onBeat() {
     playTone(440, 0.06, 0.2);
     if (S.restCount >= REST_BEATS) {
       S.miniSet++;
-      S.phase = 'rep';
+      S.phase     = 'rep';
       S.restCount = 0;
+      startRepVideo();
       playTone(1100, 0.1, 0.5);
     }
   }
@@ -703,7 +425,6 @@ function tick() {
 // ===== INTERVAL =====
 function startInterval() {
   S.phase = 'interval';
-  stopBenchAnim();
   clearTimeout(S.timer);
   S.intervalEndTime = Date.now() + S.interval * 1000;
   S.intervalTimer   = setTimeout(endInterval, S.interval * 1000);
@@ -714,11 +435,12 @@ function startInterval() {
 
 function endInterval() {
   S.setNum++;
-  S.miniSet  = 1;
-  S.repCount = 0;
+  S.miniSet   = 1;
+  S.repCount  = 0;
   S.restCount = 0;
-  S.phase = 'rep';
+  S.phase     = 'rep';
   S.nextBeatTime = Date.now();
+  startRepVideo();
   playTone(1100, 0.12, 0.5);
   tick();
   updateDisplay();
@@ -732,15 +454,15 @@ function tickIntervalDisplay() {
 
 // ===== START / STOP =====
 function startTraining() {
-  S.running   = true;
-  S.phase     = 'rep';
-  S.miniSet   = 1;
-  S.repCount  = 0;
-  S.restCount = 0;
-  S.setNum    = 1;
-  S.totalReps = 0;
+  S.running      = true;
+  S.phase        = 'rep';
+  S.miniSet      = 1;
+  S.repCount     = 0;
+  S.restCount    = 0;
+  S.setNum       = 1;
+  S.totalReps    = 0;
   S.nextBeatTime = Date.now();
-  updateBenchPose(BB_Y_UP);
+  startRepVideo();
 
   const btn = document.getElementById('btn-start');
   btn.textContent = '停止';
@@ -754,7 +476,7 @@ function stopTraining() {
   clearTimeout(S.timer);
   clearTimeout(S.intervalTimer);
   clearTimeout(S.displayTimer);
-  stopBenchAnim();
+  pauseRepVideo();
   S.timer = S.intervalTimer = S.displayTimer = null;
   S.phase = 'idle';
 
@@ -783,16 +505,7 @@ function updateClock() {
 
 // ===== INIT =====
 function init() {
-  // Video availability check
-  const video = document.getElementById('bench-video');
-  video.addEventListener('loadedmetadata', () => {
-    _useVideo = true;
-    document.getElementById('bench-svg').style.display = 'none';
-    video.style.display = 'block';
-  });
-
   buildMiniSetDots();
-  updateBenchPose(BB_Y_UP);
   updateDisplay();
   updateClock();
   setInterval(updateClock, 1000);
