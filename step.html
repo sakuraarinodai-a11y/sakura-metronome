@@ -322,6 +322,79 @@
   #btn-start:hover:not(:disabled) { background: #166534; }
   #btn-start.stop { background: #4a0e0e; border-color: #DC2626; color: #F87171; }
   #btn-start.stop:hover { background: #5a1010; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 767px) {
+    /* Header */
+    header { padding: 8px 14px; }
+    .header-title { font-size: 15px; }
+    #clock { font-size: 15px; }
+    #btn-fullscreen { font-size: 15px; padding: 5px 8px; }
+
+    /* Main: 縦1列に */
+    main {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr;
+    }
+
+    /* Left panel */
+    .tach-panel {
+      border-right: none;
+      border-bottom: 1px solid #1a1a1a;
+      padding: 6px 10px 6px;
+      gap: 4px;
+    }
+    .metro-wrap {
+      height: 190px;
+      flex: none;
+    }
+    #metro-svg { max-width: 220px; }
+
+    /* HR bar */
+    #hr-value-display { font-size: 38px; }
+    .hr-bpm-unit { font-size: 13px; }
+    #hr-zone-label { font-size: 16px; }
+
+    /* Step panel */
+    .step-panel { padding: 10px 16px; gap: 8px; }
+    #preset-name { font-size: 15px; min-height: 22px; }
+    #bpm-value { font-size: 80px; letter-spacing: -2px; }
+    #bpm-label { font-size: 15px; }
+    .beat-dot { width: 16px; height: 16px; }
+    .beat-dots { gap: 6px; }
+    .progress-labels { font-size: 12px; }
+
+    /* Done screen */
+    .done-title { font-size: 28px; }
+    .done-stat  { font-size: 15px; }
+
+    /* Footer: 2行グリッド */
+    footer {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto auto;
+      grid-template-rows: auto auto;
+      gap: 6px 8px;
+      padding: 8px 12px;
+    }
+    #btn-preset-0 { grid-column: 1; grid-row: 1; padding: 9px 8px; font-size: 13px; }
+    #btn-preset-1 { grid-column: 2; grid-row: 1; padding: 9px 8px; font-size: 13px; }
+    #btn-bt       { grid-column: 3; grid-row: 1; padding: 9px 10px; font-size: 13px; }
+    #btn-start    { grid-column: 4; grid-row: 1; padding: 9px 16px; font-size: 15px; }
+    .footer-spacer { display: none; }
+    .age-ctrl {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      width: 100%;
+      gap: 10px;
+    }
+    .age-slider-wrap { flex: 1; width: auto; }
+    .age-num  { font-size: 18px; }
+    .mhr-text { font-size: 11px; }
+
+    /* タッチ操作改善 */
+    input[type=range] { touch-action: manipulation; }
+    .footer-btn { touch-action: manipulation; }
+  }
 </style>
 </head>
 <body>
@@ -343,49 +416,108 @@
     <!-- Metronome SVG (top) -->
     <div class="metro-wrap">
       <svg id="metro-svg" viewBox="0 0 380 480" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
-        <!-- 台座 -->
-        <polygon points="60,465 320,465 345,390 35,390" fill="#141414" stroke="#282828" stroke-width="1.5"/>
-        <!-- 台座内飾り -->
-        <line x1="80" y1="412" x2="300" y2="412" stroke="#222" stroke-width="1"/>
-        <text x="190" y="452" text-anchor="middle" font-size="12" fill="#2a2a2a"
-              font-family="'Helvetica Neue',Arial,sans-serif" letter-spacing="4" font-weight="600">SAKURA</text>
-        <!-- 本体（台形） -->
-        <polygon points="100,55 280,55 340,390 40,390" fill="#181818" stroke="#262626" stroke-width="1.5"/>
-        <!-- 本体内の縦線装飾 -->
-        <line x1="190" y1="70" x2="190" y2="380" stroke="#1e1e1e" stroke-width="1.5"/>
-        <!-- 目盛り（左） -->
-        <line x1="98" y1="120" x2="120" y2="126" stroke="#2a2a2a" stroke-width="1.2"/>
-        <line x1="88"  y1="165" x2="114" y2="168" stroke="#2a2a2a" stroke-width="1.2"/>
-        <line x1="80"  y1="210" x2="110" y2="210" stroke="#333"    stroke-width="1.5"/>
-        <line x1="80"  y1="255" x2="110" y2="252" stroke="#2a2a2a" stroke-width="1.2"/>
-        <line x1="82"  y1="300" x2="112" y2="294" stroke="#2a2a2a" stroke-width="1.2"/>
-        <!-- 目盛り（右） -->
-        <line x1="282" y1="120" x2="260" y2="126" stroke="#2a2a2a" stroke-width="1.2"/>
-        <line x1="292" y1="165" x2="266" y2="168" stroke="#2a2a2a" stroke-width="1.2"/>
-        <line x1="300" y1="210" x2="270" y2="210" stroke="#333"    stroke-width="1.5"/>
-        <line x1="298" y1="255" x2="270" y2="252" stroke="#2a2a2a" stroke-width="1.2"/>
-        <line x1="298" y1="300" x2="268" y2="294" stroke="#2a2a2a" stroke-width="1.2"/>
-        <!-- 支点ピン -->
-        <circle cx="190" cy="58" r="10" fill="#222" stroke="#3a3a3a" stroke-width="2"/>
-        <circle cx="190" cy="58" r="4"  fill="#444"/>
-        <!-- 振り子（支点(190,58)に平行移動してからrotate） -->
+        <defs>
+          <linearGradient id="st-face" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#8a6020"/>
+            <stop offset="25%"  stop-color="#c8a050"/>
+            <stop offset="50%"  stop-color="#d8b868"/>
+            <stop offset="75%"  stop-color="#c8a050"/>
+            <stop offset="100%" stop-color="#8a6020"/>
+          </linearGradient>
+          <linearGradient id="st-slot" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#2a1206"/>
+            <stop offset="100%" stop-color="#060302"/>
+          </linearGradient>
+          <linearGradient id="st-wt" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%"   stop-color="#fff080"/>
+            <stop offset="40%"  stop-color="#f4b020"/>
+            <stop offset="100%" stop-color="#b87010"/>
+          </linearGradient>
+          <filter id="st-nglow" x="-80%" y="-5%" width="260%" height="110%">
+            <feGaussianBlur stdDeviation="2.5" result="b"/>
+            <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+        </defs>
+
+        <!-- 3D sides -->
+        <polygon points="92,62 37,394 30,400 85,66"    fill="#6a4010"/>
+        <polygon points="288,62 343,394 350,400 295,66" fill="#5a3408"/>
+        <polygon points="37,394 343,394 350,400 30,400" fill="#3a2006"/>
+
+        <!-- Main body face -->
+        <polygon points="92,62 288,62 343,394 37,394" fill="url(#st-face)"/>
+        <polygon points="92,62 288,62 343,394 37,394" fill="none" stroke="#2e1404" stroke-width="2"/>
+
+        <!-- Scale marks — left of slot -->
+        <line x1="168" y1="90"  x2="84"  y2="90"  stroke="#6a4818" stroke-width="2"/>
+        <line x1="168" y1="110" x2="92"  y2="110" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="168" y1="130" x2="80"  y2="130" stroke="#6a4818" stroke-width="2"/>
+        <line x1="168" y1="150" x2="88"  y2="150" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="168" y1="170" x2="74"  y2="170" stroke="#6a4818" stroke-width="2"/>
+        <line x1="168" y1="190" x2="82"  y2="190" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="168" y1="210" x2="68"  y2="210" stroke="#6a4818" stroke-width="2"/>
+        <line x1="168" y1="230" x2="76"  y2="230" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="168" y1="250" x2="62"  y2="250" stroke="#6a4818" stroke-width="2"/>
+        <line x1="168" y1="270" x2="70"  y2="270" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="168" y1="290" x2="56"  y2="290" stroke="#6a4818" stroke-width="2"/>
+        <line x1="168" y1="310" x2="64"  y2="310" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="168" y1="330" x2="50"  y2="330" stroke="#6a4818" stroke-width="2"/>
+        <line x1="168" y1="350" x2="58"  y2="350" stroke="#6a4818" stroke-width="1.2"/>
+
+        <!-- Scale marks — right of slot -->
+        <line x1="212" y1="90"  x2="296" y2="90"  stroke="#6a4818" stroke-width="2"/>
+        <line x1="212" y1="110" x2="288" y2="110" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="212" y1="130" x2="300" y2="130" stroke="#6a4818" stroke-width="2"/>
+        <line x1="212" y1="150" x2="292" y2="150" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="212" y1="170" x2="306" y2="170" stroke="#6a4818" stroke-width="2"/>
+        <line x1="212" y1="190" x2="298" y2="190" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="212" y1="210" x2="312" y2="210" stroke="#6a4818" stroke-width="2"/>
+        <line x1="212" y1="230" x2="304" y2="230" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="212" y1="250" x2="318" y2="250" stroke="#6a4818" stroke-width="2"/>
+        <line x1="212" y1="270" x2="310" y2="270" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="212" y1="290" x2="324" y2="290" stroke="#6a4818" stroke-width="2"/>
+        <line x1="212" y1="310" x2="316" y2="310" stroke="#6a4818" stroke-width="1.2"/>
+        <line x1="212" y1="330" x2="330" y2="330" stroke="#6a4818" stroke-width="2"/>
+        <line x1="212" y1="350" x2="322" y2="350" stroke="#6a4818" stroke-width="1.2"/>
+
+        <!-- BPM label -->
+        <text x="190" y="52" text-anchor="middle" font-size="13" fill="#7a5010"
+              font-family="'Helvetica Neue',Arial,sans-serif"
+              letter-spacing="0.14em" font-weight="700">BPM</text>
+
+        <!-- Central slot (dark arch) -->
+        <path d="M 170,80 A 20,20 0 0,0 210,80 L 210,392 L 170,392 Z"
+              fill="url(#st-slot)"/>
+        <line x1="170" y1="80" x2="170" y2="392" stroke="#1a0c04" stroke-width="1.5"/>
+        <line x1="210" y1="80" x2="210" y2="392" stroke="#1a0c04" stroke-width="1.5"/>
+
+        <!-- Pendulum group (pivot = 190,58 — everything hangs down, transform-origin: 50% 0% works) -->
         <g transform="translate(190,58)">
           <g id="pendulum-group">
-            <!-- 棒 -->
-            <line x1="0" y1="0" x2="0" y2="320" stroke="#c0c0c0" stroke-width="5" stroke-linecap="round"/>
-            <!-- 棒の光沢 -->
-            <line x1="-1" y1="10" x2="-1" y2="310" stroke="#e0e0e0" stroke-width="1.5" stroke-linecap="round" opacity="0.4"/>
-            <!-- 調整重り（スライダー） -->
-            <rect x="-20" y="170" width="40" height="26" rx="4" fill="#1e1e1e" stroke="#484848" stroke-width="1.5"/>
-            <line x1="-14" y1="183" x2="14" y2="183" stroke="#555" stroke-width="1.5"/>
-            <!-- 先端の錘 -->
-            <circle cx="0" cy="304" r="34" fill="#2a2a2a" stroke="#404040" stroke-width="2"/>
-            <circle cx="0" cy="304" r="26" fill="#1a1a1a"/>
-            <!-- 錘のハイライト -->
-            <circle cx="-8" cy="296" r="8" fill="#e8c4b8" opacity="0.9"/>
-            <circle cx="-8" cy="296" r="4" fill="#f4d8ce" opacity="0.8"/>
+            <!-- Needle shaft -->
+            <rect x="-3" y="0" width="6" height="316" rx="3"
+                  fill="#eae6da" filter="url(#st-nglow)"/>
+            <!-- Weight (yellow teardrop) -->
+            <path d="M 0,82 C 26,82 28,114 0,140 C -26,114 -24,82 0,82"
+                  fill="url(#st-wt)"/>
+            <!-- Weight shine -->
+            <ellipse cx="-7" cy="94" rx="8" ry="11"
+                     fill="rgba(255,255,220,0.42)" transform="rotate(-10,-7,94)"/>
+            <!-- Tail detail -->
+            <rect x="-5" y="314" width="10" height="18" rx="5" fill="#c09840"/>
           </g>
         </g>
+
+        <!-- Pivot pin -->
+        <circle cx="190" cy="58" r="11"  fill="#221004" stroke="#c09030" stroke-width="2"/>
+        <circle cx="190" cy="58" r="5"   fill="#e8b838"/>
+        <circle cx="190" cy="58" r="2"   fill="#fff8e0"/>
+
+        <!-- Base pill -->
+        <rect x="50" y="397" width="280" height="34" rx="17"
+              fill="#160c06" stroke="#2a1808" stroke-width="1.5"/>
+        <circle cx="190" cy="414" r="10"  fill="#241008" stroke="#3a2010" stroke-width="1.5"/>
+        <circle cx="190" cy="414" r="4.5" fill="#3a2010"/>
       </svg>
     </div>
 
