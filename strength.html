@@ -81,16 +81,20 @@
     0%   { transform: scale(1.5); opacity: 0; }
     100% { transform: scale(1);   opacity: 1; }
   }
-  /* 動画ラッパー */
+  /* 動画ラッパー：上40%クロップ（aspect-ratioで高さを制御） */
   .video-wrapper {
     width: 100%;
     max-width: 520px;
+    aspect-ratio: 16 / 5.4;   /* 16:9 × 60% = 16:5.4 */
+    overflow: hidden;
+    border-radius: 12px;
   }
   #bench-video {
     width: 100%;
+    height: 100%;
     display: block;
-    /* 上40%クロップ＋角丸を clip-path で一括処理 */
-    clip-path: inset(22.5% 0 0 0 round 12px);
+    object-fit: cover;
+    object-position: center bottom;  /* 下60%を表示（上40%を隠す） */
     mix-blend-mode: screen;
   }
 
