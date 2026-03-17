@@ -137,7 +137,7 @@
     align-items: center;
     justify-content: center;
     padding: 20px 32px;
-    gap: 18px;
+    gap: 14px;
     background: #0d0d0d;
   }
 
@@ -219,10 +219,110 @@
   }
   #progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #0284C7, #22C55E, #D97706);
+    background: linear-gradient(90deg, #0284C7, #22C55E, #EAB308);
     border-radius: 5px;
     transition: width 0.3s ease;
     width: 0%;
+  }
+
+  /* ===== INTERVAL SETTINGS ===== */
+  #interval-settings {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  #interval-settings.hidden { display: none; }
+
+  .iset-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .iset-label {
+    font-size: 13px;
+    color: #666;
+    white-space: nowrap;
+    min-width: 80px;
+  }
+  .iset-ctrl {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+  }
+  #interval-phase-disp {
+    font-size: 17px;
+    font-weight: 700;
+    color: #fff;
+    min-width: 40px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  .total-time-btns {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .time-btn {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #888;
+    font-size: 13px;
+    padding: 7px 12px;
+    border-radius: 7px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+  }
+  .time-btn.selected {
+    background: #1a2e3a;
+    border-color: #0284C7;
+    color: #38BDF8;
+  }
+  .time-btn:hover:not(.selected) { background: #222; }
+
+  /* ===== INTERVAL LIVE ===== */
+  #interval-live {
+    display: flex;
+    gap: 24px;
+    align-items: center;
+  }
+  #interval-live.hidden { display: none; }
+  .ilive-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+  }
+  #interval-phase-countdown {
+    font-size: 46px;
+    font-weight: 900;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  #interval-total-countdown {
+    font-size: 26px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: #888;
+    line-height: 1;
+  }
+  .ilive-lbl {
+    font-size: 12px;
+    color: #555;
+    margin-top: 2px;
+  }
+  .ilive-divider {
+    width: 1px;
+    height: 52px;
+    background: #222;
+  }
+  #interval-set-label {
+    font-size: 15px;
+    color: #777;
   }
 
   /* Done screen */
@@ -235,11 +335,12 @@
     text-align: center;
   }
   #done-screen.visible { display: flex; }
-  .step-panel-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; width: 100%; }
+  .step-panel-inner { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; width: 100%; }
   .step-panel-inner.hidden { display: none; }
   .done-title { font-size: 36px; font-weight: 800; color: #22C55E; letter-spacing: 0.05em; }
   .done-stat { font-size: 18px; color: #aaa; }
   .done-stat span { color: #fff; font-weight: 700; font-size: 22px; }
+  #done-time-row { display: none; }
   #btn-retry {
     background: #1a1a1a;
     border: 1px solid #333;
@@ -364,6 +465,16 @@
     .beat-dots { gap: 6px; }
     .progress-labels { font-size: 12px; }
 
+    /* Interval settings */
+    .iset-label { min-width: 64px; font-size: 12px; }
+    #interval-phase-disp { font-size: 14px; }
+    .time-btn { font-size: 12px; padding: 6px 10px; }
+
+    /* Interval live */
+    #interval-phase-countdown { font-size: 34px; }
+    #interval-total-countdown { font-size: 20px; }
+    #interval-set-label { font-size: 13px; }
+
     /* Done screen */
     .done-title { font-size: 28px; }
     .done-stat  { font-size: 15px; }
@@ -372,18 +483,19 @@
     footer {
       display: grid;
       grid-template-columns: 1fr 1fr auto auto;
-      grid-template-rows: auto auto;
+      grid-template-rows: auto auto auto;
       gap: 6px 8px;
       padding: 8px 12px;
     }
-    #btn-preset-0 { grid-column: 1; grid-row: 1; padding: 9px 8px; font-size: 13px; }
-    #btn-preset-1 { grid-column: 2; grid-row: 1; padding: 9px 8px; font-size: 13px; }
+    #btn-preset-0 { grid-column: 1; grid-row: 1; padding: 9px 4px; font-size: 12px; }
+    #btn-preset-1 { grid-column: 2; grid-row: 1; padding: 9px 4px; font-size: 12px; }
     #btn-bt       { grid-column: 3; grid-row: 1; padding: 9px 10px; font-size: 13px; }
     #btn-start    { grid-column: 4; grid-row: 1; padding: 9px 16px; font-size: 15px; }
+    #btn-preset-2 { grid-column: 1 / -1; grid-row: 2; font-size: 13px; padding: 9px 8px; }
     .footer-spacer { display: none; }
     .age-ctrl {
       grid-column: 1 / -1;
-      grid-row: 2;
+      grid-row: 3;
       width: 100%;
       gap: 10px;
     }
@@ -491,7 +603,7 @@
         <line x1="170" y1="80" x2="170" y2="392" stroke="#1a0c04" stroke-width="1.5"/>
         <line x1="210" y1="80" x2="210" y2="392" stroke="#1a0c04" stroke-width="1.5"/>
 
-        <!-- Pendulum group (pivot = 190,58 — everything hangs down, transform-origin: 50% 0% works) -->
+        <!-- Pendulum group (pivot = 190,58) -->
         <g transform="translate(190,58)">
           <g id="pendulum-group">
             <!-- Needle shaft -->
@@ -553,6 +665,36 @@
 
       <div class="beat-dots" id="beat-dots"></div>
 
+      <!-- インターバル設定（未開始時のみ表示） -->
+      <div id="interval-settings" class="hidden">
+        <div class="iset-row">
+          <span class="iset-label">フェーズ時間</span>
+          <div class="iset-ctrl">
+            <input type="range" id="interval-phase-slider" min="20" max="180" step="10" value="180"
+                   oninput="onIntervalPhaseTime(this.value)">
+            <span id="interval-phase-disp">3:00</span>
+          </div>
+        </div>
+        <div class="iset-row">
+          <span class="iset-label">トータル</span>
+          <div class="total-time-btns" id="total-time-btns"></div>
+        </div>
+      </div>
+
+      <!-- インターバル実行中表示 -->
+      <div id="interval-live" class="hidden">
+        <div class="ilive-block">
+          <div id="interval-phase-countdown">3:00</div>
+          <div class="ilive-lbl">フェーズ残り</div>
+        </div>
+        <div class="ilive-divider"></div>
+        <div class="ilive-block">
+          <div id="interval-total-countdown">15:00</div>
+          <div class="ilive-lbl">トータル残り</div>
+        </div>
+        <div id="interval-set-label">セット 1</div>
+      </div>
+
       <div class="progress-wrap">
         <div class="progress-labels">
           <span id="prog-start">--</span>
@@ -569,6 +711,7 @@
       <div class="done-title">完了！</div>
       <div class="done-stat">最終 BPM: <span id="done-bpm">--</span></div>
       <div class="done-stat">総ステップ数: <span id="done-steps">--</span></div>
+      <div class="done-stat" id="done-time-row">実施時間: <span id="done-time">--</span></div>
       <button class="footer-btn" id="btn-retry">もう一度</button>
     </div>
   </div>
@@ -578,6 +721,7 @@
 <footer>
   <button class="footer-btn" id="btn-preset-0">ウォーキング1</button>
   <button class="footer-btn" id="btn-preset-1">ウォーキング2</button>
+  <button class="footer-btn" id="btn-preset-2">インターバル速歩</button>
   <div class="footer-spacer"></div>
   <!-- 年齢スライダー -->
   <div class="age-ctrl">
@@ -602,13 +746,21 @@ const ZONES = [
   { min: 0,    max: 0.50, color: '#555555', label: '安静' },
   { min: 0.50, max: 0.60, color: '#0284C7', label: 'リハビリ' },
   { min: 0.60, max: 0.70, color: '#16A34A', label: '有酸素運動' },
-  { min: 0.70, max: 0.85, color: '#D97706', label: 'トレーニング' },
+  { min: 0.70, max: 0.85, color: '#EAB308', label: 'トレーニング' },
   { min: 0.85, max: 1.00, color: '#DC2626', label: 'アスリート' },
 ];
 
 const PRESETS = [
-  { name: 'ウォーキング1', start: 75, end: 105 },
-  { name: 'ウォーキング2', start: 85, end: 115 },
+  { name: 'ウォーキング1', type: 'ramp', start: 75, end: 105 },
+  { name: 'ウォーキング2', type: 'ramp', start: 85, end: 115 },
+  {
+    name: 'インターバル速歩',
+    type: 'interval',
+    phases: [
+      { label: '早歩き',   bpm: 105, color: '#EAB308' },
+      { label: 'ゆっくり', bpm: 75,  color: '#16A34A' },
+    ],
+  },
 ];
 const BEATS_PER_LEVEL = 10;
 
@@ -626,7 +778,22 @@ const S = {
   age: 40,
   maxHR: 180,
   btDevice: null,
+  // インターバル専用
+  intervalPhase: 0,
+  intervalSet: 0,
+  intervalPhaseStartTime: 0,
+  intervalTotalStartTime: 0,
+  intervalPhaseDurationSec: 180,
+  intervalTotalDurationSec: 900,
 };
+
+// ===== UTILS =====
+function formatMMSS(totalSec) {
+  const s = Math.max(0, totalSec);
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${String(sec).padStart(2, '0')}`;
+}
 
 // ===== AUDIO =====
 let _audioCtx = null;
@@ -664,16 +831,28 @@ function onAge(v) {
   try { localStorage.setItem('sakura_step_age', S.age); } catch (_) {}
 }
 
+// ===== INTERVAL SETTINGS =====
+function onIntervalPhaseTime(val) {
+  S.intervalPhaseDurationSec = parseInt(val);
+  document.getElementById('interval-phase-disp').textContent = formatMMSS(S.intervalPhaseDurationSec);
+}
+
+function setTotalTime(min) {
+  S.intervalTotalDurationSec = min * 60;
+  document.querySelectorAll('.time-btn').forEach(b => {
+    b.classList.toggle('selected', parseInt(b.dataset.min) === min);
+  });
+}
+
 // ===== HR BAR GAUGE (horizontal) =====
 // SVG viewBox: 0 0 530 90
 // 50%未満（安静域）は非表示。バーは 50%〜100% を全幅にマッピング
 const H_BAR_X    = 0;
-const H_BAR_Y    = 22;   // BPMラベル下
+const H_BAR_Y    = 22;
 const H_BAR_W    = 530;
-const H_BAR_H    = 50;   // バー高さ（大きく）
-const H_DISP_MIN = 0.50; // 表示開始比率
+const H_BAR_H    = 50;
+const H_DISP_MIN = 0.50;
 
-// 比率 → バー上のx座標（50%〜100%を全幅に拡大）
 function ratioToBarX(ratio) {
   return H_BAR_W * (ratio - H_DISP_MIN) / (1 - H_DISP_MIN);
 }
@@ -698,6 +877,22 @@ function buildHRBar(maxHR) {
     rect.setAttribute('opacity', '0.6');
     rect.setAttribute('id', 'zone-bar-' + zone.label);
     gZones.appendChild(rect);
+
+    // ゾーン名ラベル（バー内中央）
+    if (w > 46) {
+      const lbl = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+      lbl.setAttribute('x', x + w / 2);
+      lbl.setAttribute('y', H_BAR_Y + H_BAR_H / 2 + 5);
+      lbl.setAttribute('text-anchor', 'middle');
+      lbl.setAttribute('font-size', w > 100 ? '12' : '10');
+      lbl.setAttribute('font-weight', '700');
+      lbl.setAttribute('fill', 'rgba(255,255,255,0.7)');
+      lbl.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
+      lbl.setAttribute('pointer-events', 'none');
+      lbl.setAttribute('id', 'zone-lbl-' + zone.label);
+      lbl.textContent = zone.label;
+      gZones.appendChild(lbl);
+    }
   });
 
   // BPMラベル + 境界縦線（50%, 60%, 70%, 85%, 100%）
@@ -715,7 +910,6 @@ function buildHRBar(maxHR) {
       gTicks.appendChild(line);
     }
 
-    // BPMラベル
     const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
     txt.setAttribute('x', x);
     txt.setAttribute('y', H_BAR_Y - 6);
@@ -733,7 +927,6 @@ function buildHRBar(maxHR) {
 function updateHRBar(hr, maxHR) {
   const ratio = hr / maxHR;
 
-  // 50%未満は値・ゾーンを非表示
   if (ratio < H_DISP_MIN) {
     document.getElementById('hr-pointer-group').setAttribute('opacity', '0');
     document.getElementById('hr-value-display').textContent = '--';
@@ -753,7 +946,7 @@ function updateHRBar(hr, maxHR) {
   pg.setAttribute('opacity', '1');
   pg.setAttribute('transform', `translate(${x}, 0)`);
 
-  let currentZone = ZONES[1]; // 50%以上なのでリハビリ以上
+  let currentZone = ZONES[1];
   ZONES.forEach(zone => {
     const el = document.getElementById('zone-bar-' + zone.label);
     if (clampedRatio >= zone.min && clampedRatio < zone.max) {
@@ -771,10 +964,9 @@ function updateHRBar(hr, maxHR) {
 }
 
 // ===== METRONOME ANIMATION =====
-// ビートごとに方向を明示指定して alternate に依存しない
 let _pendulumAnim  = null;
-let _pendulumAngle = -26; // 現在の停止角度
-let _pendulumDir   = 1;   // 次に向かう方向 (+1=右, -1=左)
+let _pendulumAngle = -26;
+let _pendulumDir   = 1;
 
 function swingPendulum(bpm) {
   if (bpm <= 0) return;
@@ -820,10 +1012,20 @@ function updateBeatDots(beatIndex) {
   }
 }
 
-// ===== PROGRESS BAR =====
+// ===== BPM FLASH =====
+let _flashTimer = null;
+function flashBPM() {
+  const el = document.getElementById('bpm-value');
+  el.classList.add('flash');
+  if (_flashTimer) clearTimeout(_flashTimer);
+  _flashTimer = setTimeout(() => el.classList.remove('flash'), 80);
+}
+
+// ===== PROGRESS BAR (ramp mode) =====
 function updateProgress() {
-  if (!S.selectedPreset) return;
+  if (S.selectedPreset === null) return;
   const preset = PRESETS[S.selectedPreset];
+  if (preset.type !== 'ramp') return;
   const range = preset.end - preset.start;
   const current = S.running ? S.bpm : preset.start;
   const ratio = range > 0 ? (current - preset.start) / range : 0;
@@ -834,21 +1036,12 @@ function updateProgress() {
   document.getElementById('prog-end').textContent = preset.end;
 }
 
-// ===== BPM FLASH =====
-let _flashTimer = null;
-function flashBPM() {
-  const el = document.getElementById('bpm-value');
-  el.classList.add('flash');
-  if (_flashTimer) clearTimeout(_flashTimer);
-  _flashTimer = setTimeout(() => el.classList.remove('flash'), 80);
-}
-
-// ===== METRONOME ENGINE =====
+// ===== RAMP MODE ENGINE =====
 function onBeat() {
   S.beatInLevel++;
   S.totalBeats++;
 
-  swingPendulum(S.bpm); // ビートのたびに方向を明示して振り子を動かす
+  swingPendulum(S.bpm);
 
   const isAccent  = (S.beatInLevel === 1);
   const isLevelUp = (S.beatInLevel > BEATS_PER_LEVEL);
@@ -888,9 +1081,105 @@ function tick() {
   S.timer = setTimeout(tick, Math.max(1, Math.min(S.nextBeatTime - Date.now(), 16)));
 }
 
+// ===== INTERVAL MODE ENGINE =====
+function onBeatInterval() {
+  S.totalBeats++;
+  S.beatInLevel++;
+  if (S.beatInLevel > BEATS_PER_LEVEL) S.beatInLevel = 1;
+  swingPendulum(S.bpm);
+  flashBPM();
+  if (S.beatInLevel === 1) {
+    playTone(1200, 0.07, 0.5, 'sine');
+  } else {
+    playTone(880, 0.05, 0.3, 'sine');
+  }
+  updateBeatDots(S.beatInLevel);
+}
+
+function tickInterval() {
+  if (!S.running) return;
+  const now = Date.now();
+
+  // ビート処理
+  if (now >= S.nextBeatTime - 5) {
+    onBeatInterval();
+    S.nextBeatTime += 60000 / S.bpm;
+  }
+
+  // トータル残り時間チェック
+  const totalElapsed   = (now - S.intervalTotalStartTime) / 1000;
+  const totalRemaining = S.intervalTotalDurationSec - totalElapsed;
+  if (totalRemaining <= 0) {
+    stopMetronome(true);
+    return;
+  }
+
+  // フェーズ残り時間チェック
+  const phaseElapsed   = (now - S.intervalPhaseStartTime) / 1000;
+  const phaseRemaining = S.intervalPhaseDurationSec - phaseElapsed;
+  if (phaseRemaining <= 0) {
+    nextIntervalPhase();
+  } else {
+    updateIntervalCountdown(phaseRemaining, totalRemaining);
+  }
+
+  S.timer = setTimeout(tickInterval, Math.max(1, Math.min(S.nextBeatTime - Date.now(), 100)));
+}
+
+function nextIntervalPhase() {
+  const preset = PRESETS[S.selectedPreset];
+  S.intervalPhase = (S.intervalPhase + 1) % preset.phases.length;
+  if (S.intervalPhase === 0) S.intervalSet++;
+
+  S.bpm = preset.phases[S.intervalPhase].bpm;
+  S.intervalPhaseStartTime = Date.now();
+
+  // フェーズ切り替え音
+  if (S.intervalPhase === 0) {
+    // ゆっくり→早歩き：上昇音
+    playTone(880, 0.12, 0.5);
+    setTimeout(() => playTone(1100, 0.12, 0.5), 140);
+    setTimeout(() => playTone(1320, 0.18, 0.5), 280);
+  } else {
+    // 早歩き→ゆっくり：下降音
+    playTone(1100, 0.12, 0.4);
+    setTimeout(() => playTone(880, 0.12, 0.4), 140);
+    setTimeout(() => playTone(660, 0.18, 0.4), 280);
+  }
+  updateIntervalDisplay();
+}
+
+function updateIntervalDisplay() {
+  const preset = PRESETS[S.selectedPreset];
+  const phase  = preset.phases[S.intervalPhase];
+  const emoji  = S.intervalPhase === 0 ? '🏃' : '🚶';
+  document.getElementById('preset-name').textContent = `${emoji} ${phase.label} — セット ${S.intervalSet + 1}`;
+  document.getElementById('preset-name').style.color = phase.color;
+  document.getElementById('bpm-value').textContent   = S.bpm;
+  document.getElementById('interval-set-label').textContent = `セット ${S.intervalSet + 1}`;
+  document.getElementById('progress-bar-fill').style.background = phase.color;
+}
+
+function updateIntervalCountdown(phaseRemaining, totalRemaining) {
+  document.getElementById('interval-phase-countdown').textContent = formatMMSS(phaseRemaining);
+  document.getElementById('interval-total-countdown').textContent = formatMMSS(totalRemaining);
+  // フェーズ進行バー（経過 / 総フェーズ時間）
+  const elapsed = S.intervalPhaseDurationSec - phaseRemaining;
+  const pct = Math.max(0, Math.min(100, (elapsed / S.intervalPhaseDurationSec) * 100));
+  document.getElementById('progress-bar-fill').style.width = pct + '%';
+}
+
+// ===== START / STOP =====
 function startMetronome() {
   if (S.selectedPreset === null) return;
   const preset = PRESETS[S.selectedPreset];
+
+  if (preset.type === 'interval') {
+    startIntervalMode();
+    return;
+  }
+
+  // ramp mode
   S.bpm = preset.start;
   S.beatInLevel = 0;
   S.totalBeats = 0;
@@ -907,19 +1196,66 @@ function startMetronome() {
   tick();
 }
 
+function startIntervalMode() {
+  const preset = PRESETS[S.selectedPreset];
+  S.intervalPhase          = 0;
+  S.intervalSet            = 0;
+  S.bpm                    = preset.phases[0].bpm;
+  S.beatInLevel            = 0;
+  S.totalBeats             = 0;
+  S.running                = true;
+  S.nextBeatTime           = Date.now();
+  S.intervalPhaseStartTime = Date.now();
+  S.intervalTotalStartTime = Date.now();
+
+  document.getElementById('interval-settings').classList.add('hidden');
+  document.getElementById('interval-live').classList.remove('hidden');
+  document.getElementById('interval-phase-countdown').textContent = formatMMSS(S.intervalPhaseDurationSec);
+  document.getElementById('interval-total-countdown').textContent = formatMMSS(S.intervalTotalDurationSec);
+  document.getElementById('btn-start').textContent = '停止';
+  document.getElementById('btn-start').classList.add('stop');
+  document.getElementById('progress-bar-fill').style.width = '0%';
+  updateBeatDots(0);
+  updateIntervalDisplay();
+  tickInterval();
+}
+
 function stopMetronome(completed) {
   S.running = false;
   clearTimeout(S.timer);
   S.timer = null;
 
+  const preset = S.selectedPreset !== null ? PRESETS[S.selectedPreset] : null;
+
   if (completed) {
+    if (preset && preset.type === 'interval') {
+      document.getElementById('interval-live').classList.add('hidden');
+      document.getElementById('interval-settings').classList.remove('hidden');
+    }
     showDoneScreen();
+    return;
+  }
+
+  document.getElementById('btn-start').textContent = '開始';
+  document.getElementById('btn-start').classList.remove('stop');
+
+  if (preset) {
+    if (preset.type === 'ramp') {
+      document.getElementById('bpm-value').textContent = preset.start;
+      updateBeatDots(0);
+      updateProgress();
+    } else if (preset.type === 'interval') {
+      document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
+      document.getElementById('preset-name').textContent = preset.name;
+      document.getElementById('preset-name').style.color = '#aaa';
+      document.getElementById('interval-live').classList.add('hidden');
+      document.getElementById('interval-settings').classList.remove('hidden');
+      document.getElementById('progress-bar-fill').style.width = '0%';
+      document.getElementById('progress-bar-fill').style.background = preset.phases[0].color;
+      updateBeatDots(0);
+    }
   } else {
-    document.getElementById('btn-start').textContent = '開始';
-    document.getElementById('btn-start').classList.remove('stop');
-    document.getElementById('bpm-value').textContent = S.selectedPreset !== null ? PRESETS[S.selectedPreset].start : '--';
-    updateBeatDots(0);
-    updateProgress();
+    document.getElementById('bpm-value').textContent = '--';
   }
 }
 
@@ -928,6 +1264,17 @@ function showDoneScreen() {
   document.getElementById('done-screen').classList.add('visible');
   document.getElementById('done-bpm').textContent = S.bpm;
   document.getElementById('done-steps').textContent = S.totalBeats.toLocaleString();
+
+  const preset = S.selectedPreset !== null ? PRESETS[S.selectedPreset] : null;
+  const doneTimeRow = document.getElementById('done-time-row');
+  if (preset && preset.type === 'interval') {
+    const elapsed = Math.floor((Date.now() - S.intervalTotalStartTime) / 1000);
+    document.getElementById('done-time').textContent = formatMMSS(elapsed);
+    doneTimeRow.style.display = '';
+  } else {
+    doneTimeRow.style.display = 'none';
+  }
+
   document.getElementById('btn-start').textContent = '開始';
   document.getElementById('btn-start').classList.remove('stop');
   document.getElementById('btn-start').disabled = true;
@@ -993,7 +1340,7 @@ function updateClock() {
 
 // ===== INIT =====
 function init() {
-  // 年齢をLocalStorageから復元して初期化（buildHRBar()もonAge内で呼ばれる）
+  // 年齢をLocalStorageから復元
   let initAge = 40;
   try { const s = localStorage.getItem('sakura_step_age'); if (s) initAge = parseInt(s); } catch (_) {}
   document.getElementById('age-slider').value = initAge;
@@ -1002,25 +1349,55 @@ function init() {
   buildBeatDots();
   updateClock();
   setInterval(updateClock, 1000);
-  swingPendulum(75); // 起動時に振り子を初期位置へ
+  swingPendulum(75);
 
+  // トータル時間ボタン生成
+  const totalBtnsEl = document.getElementById('total-time-btns');
+  [5, 10, 15, 20, 25, 30].forEach(min => {
+    const b = document.createElement('button');
+    b.className = 'time-btn' + (min === 15 ? ' selected' : '');
+    b.dataset.min = min;
+    b.textContent = min + '分';
+    b.addEventListener('click', () => setTotalTime(min));
+    totalBtnsEl.appendChild(b);
+  });
+
+  // プリセットボタン
   PRESETS.forEach((preset, idx) => {
     const btn = document.getElementById('btn-preset-' + idx);
+    if (!btn) return;
     btn.addEventListener('click', () => {
       if (S.running) stopMetronome(false);
       S.selectedPreset = idx;
-      document.getElementById('preset-name').textContent = preset.name;
-      document.getElementById('bpm-value').textContent = preset.start;
-      document.getElementById('prog-start').textContent = preset.start;
-      document.getElementById('prog-current').textContent = preset.start + ' BPM';
-      document.getElementById('prog-end').textContent = preset.end;
-      document.getElementById('progress-bar-fill').style.width = '0%';
+      document.getElementById('preset-name').style.color = '#aaa';
       document.getElementById('btn-start').disabled = false;
       updateBeatDots(0);
       hideDoneScreen();
       document.querySelectorAll('[id^="btn-preset-"]').forEach((b, i) => {
         b.classList.toggle('selected', i === idx);
       });
+
+      if (preset.type === 'ramp') {
+        document.getElementById('preset-name').textContent = preset.name;
+        document.getElementById('bpm-value').textContent = preset.start;
+        document.getElementById('prog-start').textContent = preset.start;
+        document.getElementById('prog-current').textContent = preset.start + ' BPM';
+        document.getElementById('prog-end').textContent = preset.end;
+        document.getElementById('progress-bar-fill').style.width = '0%';
+        document.getElementById('progress-bar-fill').style.background = 'linear-gradient(90deg, #0284C7, #22C55E, #EAB308)';
+        document.getElementById('interval-settings').classList.add('hidden');
+        document.getElementById('interval-live').classList.add('hidden');
+      } else if (preset.type === 'interval') {
+        document.getElementById('preset-name').textContent = preset.name;
+        document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
+        document.getElementById('interval-settings').classList.remove('hidden');
+        document.getElementById('interval-live').classList.add('hidden');
+        document.getElementById('prog-start').textContent = '残り';
+        document.getElementById('prog-current').textContent = formatMMSS(S.intervalPhaseDurationSec);
+        document.getElementById('prog-end').textContent = formatMMSS(S.intervalPhaseDurationSec);
+        document.getElementById('progress-bar-fill').style.width = '0%';
+        document.getElementById('progress-bar-fill').style.background = preset.phases[0].color;
+      }
     });
   });
 
@@ -1037,9 +1414,20 @@ function init() {
 
   document.getElementById('btn-retry').addEventListener('click', () => {
     hideDoneScreen();
-    document.getElementById('bpm-value').textContent = PRESETS[S.selectedPreset].start;
-    updateBeatDots(0);
-    updateProgress();
+    const preset = PRESETS[S.selectedPreset];
+    if (preset.type === 'ramp') {
+      document.getElementById('bpm-value').textContent = preset.start;
+      updateBeatDots(0);
+      updateProgress();
+    } else if (preset.type === 'interval') {
+      document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
+      document.getElementById('preset-name').textContent = preset.name;
+      document.getElementById('preset-name').style.color = '#aaa';
+      document.getElementById('interval-settings').classList.remove('hidden');
+      document.getElementById('interval-live').classList.add('hidden');
+      document.getElementById('progress-bar-fill').style.width = '0%';
+      document.getElementById('progress-bar-fill').style.background = preset.phases[0].color;
+    }
   });
 
   document.getElementById('btn-fullscreen').addEventListener('click', () => {
