@@ -502,18 +502,22 @@ function onBeat() {
     S.totalReps++;
     playTone(880, 0.06, 0.35);
     flashMain();
+    updateDisplay(); // 13回目もちゃんと表示してからリセット
+
     if (S.repCount >= REPS_PER_MINI) {
-      S.repCount = 0;
       pauseRepVideo();
+      S.repCount = 0;
       if (S.miniSet >= MINI_SETS) {
-        startInterval();
+        startInterval(); // 内部でupdateDisplay呼ぶ
         return;
-      } else {
-        S.phase     = 'rest';
-        S.restCount = 0;
-        playTone(660, 0.2, 0.4);
       }
+      S.phase     = 'rest';
+      S.restCount = 0;
+      playTone(660, 0.2, 0.4);
+      updateDisplay(); // 休憩フェーズ表示に切替
+      return;
     }
+
   } else if (S.phase === 'rest') {
     S.restCount++;
     if (S.restCount >= REST_BEATS) {
@@ -526,8 +530,8 @@ function onBeat() {
     } else {
       playTone(440, 0.06, 0.2);
     }
+    updateDisplay();
   }
-  updateDisplay();
 }
 
 function tick() {
