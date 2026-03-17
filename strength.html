@@ -14,7 +14,7 @@
     height: 100dvh;
     overflow: hidden;
     display: grid;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto 1fr;
   }
 
   /* ===== HEADER ===== */
@@ -185,11 +185,15 @@
   #total-volume { font-size: 16px; color: #555; }
   #total-volume span { color: #e8c4b8; font-weight: 700; }
 
-  /* ===== FOOTER ===== */
-  footer {
-    display: flex; align-items: center; justify-content: flex-end;
-    padding: 10px 24px 12px;
-    border-top: 1px solid #1a1a1a; background: #0d0d0d;
+  /* メトロノーム＋ボタン横並び行 */
+  .metro-row {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    width: 100%;
+    max-width: 460px;
   }
 
   /* Interval row (strength-panel内) */
@@ -270,20 +274,23 @@
   @media (max-width: 640px) {
     body { height: auto; min-height: 100dvh; overflow-y: auto; }
     main { grid-template-columns: 1fr; overflow: visible; }
-    .strength-panel { order: -1; padding: 14px; }
-    .bench-panel { border-right: none; border-top: 1px solid #1a1a1a; padding: 12px; }
+    .strength-panel { order: -1; padding: 10px; }
+    .bench-panel { border-right: none; border-top: 1px solid #1a1a1a; padding: 10px; }
     .strength-card { gap: 10px; padding: 16px; }
     #main-number { font-size: clamp(56px, 17vw, 100px); min-height: 76px; }
     #weight-display { font-size: clamp(34px, 11vw, 54px); }
     #bench-volume { font-size: clamp(20px, 6vw, 38px); }
     #bench-phase-label { font-size: clamp(18px, 5vw, 34px); }
+    .metro-row { gap: 14px; }
+    #btn-start { font-size: 16px; padding: 12px 22px; }
   }
 
   #btn-start {
     background: #14532d; border: 1px solid #16A34A; color: #4ADE80;
-    font-size: 17px; padding: 10px 34px; border-radius: 8px;
+    font-size: 18px; padding: 14px 28px; border-radius: 12px;
     cursor: pointer; font-family: inherit; font-weight: 700;
-    transition: background 0.15s; margin-left: auto;
+    transition: background 0.15s;
+    flex-shrink: 0;
   }
   #btn-start:hover { background: #166534; }
   #btn-start.stop { background: #4a0e0e; border-color: #DC2626; color: #F87171; }
@@ -330,7 +337,8 @@
   <!-- Strength Panel -->
   <div class="strength-panel">
 
-    <!-- デジタルメトロノーム（カード外・上） -->
+    <!-- メトロノーム＋ボタン横並び -->
+    <div class="metro-row">
     <svg id="metronome-svg" viewBox="-75 -65 150 295" preserveAspectRatio="xMidYMid meet">
       <defs>
         <linearGradient id="body-g" x1="0" y1="0" x2="0" y2="1">
@@ -425,6 +433,8 @@
       <ellipse cx="-30" cy="213" rx="14" ry="4" fill="#080c10" stroke="#1a2a3a" stroke-width="1"/>
       <ellipse cx="30"  cy="213" rx="14" ry="4" fill="#080c10" stroke="#1a2a3a" stroke-width="1"/>
     </svg>
+    <button id="btn-start">開始</button>
+    </div><!-- /metro-row -->
 
     <div class="strength-card" id="strength-card">
       <div class="mini-set-dots" id="mini-set-dots"></div>
@@ -453,10 +463,6 @@
   </div>
 </main>
 
-<!-- FOOTER -->
-<footer>
-  <button id="btn-start">開始</button>
-</footer>
 
 <script>
 // ===== CONSTANTS =====
