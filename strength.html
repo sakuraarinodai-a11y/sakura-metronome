@@ -91,24 +91,33 @@
   #bench-video {
     width: 100%;
     display: block;
-    margin-top: -16.875%;  /* 上30%を隠す (30% × 9/16 = 16.875%) */
+    margin-top: -22.5%;  /* 上40%を隠す (40% × 9/16 = 22.5%) */
     mix-blend-mode: screen;
   }
 
   /* 総ボリューム（動画上・大表示） */
   #bench-volume {
-    font-size: clamp(28px, 4vw, 48px);
+    font-size: clamp(26px, 3.8vw, 48px);
     font-weight: 900;
     color: #e8c4b8;
     letter-spacing: 0.02em;
     text-align: center;
+    line-height: 1.1;
+    background: #111;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 10px 20px;
+    width: 100%;
+    max-width: 520px;
   }
   #bench-volume .vol-label {
-    font-size: 0.45em;
-    color: #666;
-    font-weight: 500;
+    font-size: 0.38em;
+    color: #aaa;
+    font-weight: 600;
     display: block;
-    margin-bottom: 2px;
+    margin-bottom: 3px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
   }
 
   #bench-phase-label {
@@ -169,7 +178,8 @@
     line-height: 1; letter-spacing: -3px;
     text-align: center; color: #fff; min-height: 100px;
   }
-  #main-number.flash { color: #e8c4b8; }
+  #main-number.flash   { color: #e8c4b8; }
+  #main-number.warning { color: #FACC15; text-shadow: 0 0 24px rgba(250,204,21,0.6); }
   #main-denom   { font-size: 28px; color: #555; font-weight: 500; min-height: 36px; }
   #set-info     { font-size: 22px; font-weight: 700; color: #aaa; }
   #total-volume { font-size: 16px; color: #555; }
@@ -233,6 +243,48 @@
     line-height: 1;
   }
 
+  /* ===== PENDULUM ===== */
+  #pendulum-svg {
+    width: clamp(44px, 7vw, 72px);
+    height: auto;
+    flex-shrink: 0;
+  }
+  #pendulum-arm {
+    transform-box: view-box;
+    transform-origin: 50px 6px;
+  }
+  @keyframes swing {
+    0%   { transform: rotate(-28deg); }
+    50%  { transform: rotate(28deg); }
+    100% { transform: rotate(-28deg); }
+  }
+
+  /* Strength phase label */
+  #strength-phase-label {
+    font-size: clamp(15px, 2vw, 22px);
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    color: #444;
+    min-height: 26px;
+    text-align: center;
+  }
+  #strength-phase-label.rep      { color: #EF4444; }
+  #strength-phase-label.rest     { color: #22C55E; }
+  #strength-phase-label.interval { color: #3B82F6; }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 640px) {
+    body { height: auto; min-height: 100dvh; overflow-y: auto; }
+    main { grid-template-columns: 1fr; overflow: visible; }
+    .strength-panel { order: -1; padding: 14px; }
+    .bench-panel { border-right: none; border-top: 1px solid #1a1a1a; padding: 12px; }
+    .strength-card { gap: 10px; padding: 16px; }
+    #main-number { font-size: clamp(56px, 17vw, 100px); min-height: 76px; }
+    #weight-display { font-size: clamp(34px, 11vw, 54px); }
+    #bench-volume { font-size: clamp(20px, 6vw, 38px); }
+    #bench-phase-label { font-size: clamp(18px, 5vw, 34px); }
+  }
+
   #btn-start {
     background: #14532d; border: 1px solid #16A34A; color: #4ADE80;
     font-size: 17px; padding: 10px 34px; border-radius: 8px;
@@ -292,6 +344,18 @@
         <div id="weight-display">20 kg</div>
         <button class="weight-btn" id="btn-weight-up">▶</button>
       </div>
+
+      <!-- 振り子アニメーション -->
+      <svg id="pendulum-svg" viewBox="0 0 100 120" preserveAspectRatio="xMidYMid meet">
+        <circle cx="50" cy="6" r="5" fill="#333"/>
+        <g id="pendulum-arm">
+          <line x1="50" y1="6" x2="50" y2="94" stroke="#666" stroke-width="5" stroke-linecap="round"/>
+          <circle cx="50" cy="106" r="12" fill="#e8c4b8"/>
+        </g>
+      </svg>
+
+      <!-- フェーズ名 -->
+      <div id="strength-phase-label">スタート待ち</div>
 
       <div id="main-number">--</div>
       <div id="main-denom"></div>
@@ -444,6 +508,21 @@ function cancelCountdown() {
   S.phase = 'idle';
 }
 
+// ===== PENDULUM =====
+function startPendulum() {
+  const arm = document.getElementById('pendulum-arm');
+  if (!arm) return;
+  arm.style.animation = 'none';
+  void arm.offsetWidth;
+  const period = (2 * 60 / TEMPO).toFixed(2);
+  arm.style.animation = `swing ${period}s ease-in-out infinite`;
+}
+
+function stopPendulum() {
+  const arm = document.getElementById('pendulum-arm');
+  if (arm) arm.style.animation = 'none';
+}
+
 // ===== VIDEO CONTROL =====
 // 動画(27秒・13回)をミニセット開始時に再生し、13回完了で停止
 // playbackRate = 動画尺 ÷ 1ミニセット所要時間 で自動同期
@@ -515,6 +594,7 @@ function updateDisplay() {
   const benchLabel = document.getElementById('bench-phase-label');
 
   card.classList.remove('phase-rep', 'phase-rest', 'phase-interval');
+  mainNumber.classList.remove('warning');
   if (S.phase === 'rep')      card.classList.add('phase-rep');
   if (S.phase === 'rest')     card.classList.add('phase-rest');
   if (S.phase === 'interval') card.classList.add('phase-interval');
@@ -533,12 +613,34 @@ function updateDisplay() {
     benchLabel.classList.add('idle');
   }
 
+  const strengthLabel = document.getElementById('strength-phase-label');
+  if (strengthLabel) {
+    strengthLabel.classList.remove('rep', 'rest', 'interval');
+    if (S.phase === 'rep') {
+      strengthLabel.textContent = '筋トレ中';
+      strengthLabel.classList.add('rep');
+    } else if (S.phase === 'rest') {
+      strengthLabel.textContent = '小休止';
+      strengthLabel.classList.add('rest');
+    } else if (S.phase === 'interval') {
+      strengthLabel.textContent = 'インターバル';
+      strengthLabel.classList.add('interval');
+    } else if (S.phase === 'countdown') {
+      strengthLabel.textContent = 'カウントダウン';
+    } else {
+      strengthLabel.textContent = 'スタート待ち';
+    }
+  }
+
   if (S.phase === 'rep') {
     mainNumber.textContent = S.repCount;
     mainDenom.textContent  = '/ ' + REPS_PER_MINI;
   } else if (S.phase === 'rest') {
-    mainNumber.textContent = S.restCount;
+    const remaining = REST_BEATS - S.restCount + 1;
+    mainNumber.textContent = remaining;
     mainDenom.textContent  = '/ ' + REST_BEATS;
+    if (remaining <= 3) mainNumber.classList.add('warning');
+    else                mainNumber.classList.remove('warning');
   } else if (S.phase === 'interval') {
     const remaining = Math.max(0, Math.ceil((S.intervalEndTime - Date.now()) / 1000));
     mainNumber.textContent = remaining;
@@ -645,6 +747,7 @@ function beginTraining() {
   S.totalReps    = 0;
   S.nextBeatTime = Date.now();
   startRepVideo();
+  startPendulum();
   updateDisplay();
   tick();
 }
@@ -656,6 +759,7 @@ function stopTraining() {
   clearTimeout(S.intervalTimer);
   clearTimeout(S.displayTimer);
   pauseRepVideo();
+  stopPendulum();
   S.timer = S.intervalTimer = S.displayTimer = null;
   S.phase = 'idle';
 
