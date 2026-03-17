@@ -66,59 +66,57 @@
   /* --- Left panel --- */
   .tach-panel {
     display: flex;
-    align-items: stretch;
+    flex-direction: column;
     border-right: 1px solid #1a1a1a;
     background: #0b0b0b;
-    padding: 12px 8px 12px 12px;
-    gap: 8px;
+    padding: 10px 14px 10px 14px;
+    gap: 6px;
     overflow: hidden;
   }
 
-  /* HR vertical bar */
-  .hr-gauge-wrap {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    flex-shrink: 0;
-    width: 120px;
-  }
-  #hr-value-display {
-    font-size: 48px;
-    font-weight: 900;
-    color: #fff;
-    font-variant-numeric: tabular-nums;
-    line-height: 1;
-    text-align: center;
-    min-width: 80px;
-  }
-  .hr-bpm-unit {
-    font-size: 12px;
-    color: #555;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-top: -4px;
-  }
-  #hr-bar-svg { display: block; }
-  #hr-zone-label {
-    font-size: 12px;
-    font-weight: 700;
-    color: #666;
-    text-align: center;
-    min-height: 18px;
-    letter-spacing: 0.04em;
-  }
-
-  /* Metronome */
+  /* Metronome (top, takes remaining space) */
   .metro-wrap {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    min-width: 0;
+    min-height: 0;
   }
+
+  /* HR horizontal bar area (bottom) */
+  .hr-bar-h-area {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding-top: 4px;
+    border-top: 1px solid #1a1a1a;
+  }
+  .hr-h-info {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+  }
+  #hr-value-display {
+    font-size: 64px;
+    font-weight: 900;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+    line-height: 1;
+  }
+  .hr-bpm-unit {
+    font-size: 18px;
+    color: #555;
+    letter-spacing: 0.08em;
+  }
+  #hr-zone-label {
+    font-size: 22px;
+    font-weight: 800;
+    color: #555;
+    letter-spacing: 0.05em;
+  }
+  #hr-bar-svg { display: block; width: 100%; }
   #metro-svg {
     width: 100%;
     height: 100%;
@@ -342,19 +340,7 @@
   <!-- Left Panel -->
   <div class="tach-panel">
 
-    <!-- HR vertical bar -->
-    <div class="hr-gauge-wrap">
-      <div id="hr-value-display">--</div>
-      <div class="hr-bpm-unit">bpm</div>
-      <svg id="hr-bar-svg" viewBox="0 0 108 360" width="108" height="360">
-        <g id="hr-zone-bars"></g>
-        <rect id="hr-indicator" x="2" y="338" width="76" height="4" fill="white" rx="2" opacity="0"/>
-        <g id="hr-ticks"></g>
-      </svg>
-      <div id="hr-zone-label">---</div>
-    </div>
-
-    <!-- Metronome SVG -->
+    <!-- Metronome SVG (top) -->
     <div class="metro-wrap">
       <svg id="metro-svg" viewBox="0 0 380 480" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
         <!-- 台座 -->
@@ -399,6 +385,24 @@
             <circle cx="-8" cy="296" r="8" fill="#e8c4b8" opacity="0.9"/>
             <circle cx="-8" cy="296" r="4" fill="#f4d8ce" opacity="0.8"/>
           </g>
+        </g>
+      </svg>
+    </div>
+
+    <!-- HR horizontal bar (bottom) -->
+    <div class="hr-bar-h-area">
+      <div class="hr-h-info">
+        <span id="hr-value-display">--</span>
+        <span class="hr-bpm-unit">bpm</span>
+        <span id="hr-zone-label">---</span>
+      </div>
+      <svg id="hr-bar-svg" viewBox="0 0 530 72" preserveAspectRatio="xMidYMid meet">
+        <g id="hr-zone-bars"></g>
+        <g id="hr-ticks"></g>
+        <!-- ポインター（心拍数位置インジケーター） -->
+        <g id="hr-pointer-group" opacity="0">
+          <line x1="0" y1="14" x2="0" y2="52" stroke="white" stroke-width="3" stroke-linecap="round"/>
+          <polygon points="-8,52 8,52 0,64" fill="white"/>
         </g>
       </svg>
     </div>
@@ -528,11 +532,12 @@ function onAge(v) {
   try { localStorage.setItem('sakura_step_age', S.age); } catch (_) {}
 }
 
-// ===== HR BAR GAUGE =====
-const BAR_TOP    = 10;
-const BAR_HEIGHT = 320;
-const BAR_LEFT   = 8;
-const BAR_W      = 64;
+// ===== HR BAR GAUGE (horizontal) =====
+// SVG viewBox: 0 0 530 72
+const H_BAR_X = 0;
+const H_BAR_Y = 20;  // BPMラベル下
+const H_BAR_W = 530;
+const H_BAR_H = 34;
 
 function buildHRBar(maxHR) {
   const gZones = document.getElementById('hr-zone-bars');
@@ -540,45 +545,45 @@ function buildHRBar(maxHR) {
   gZones.innerHTML = '';
   gTicks.innerHTML = '';
 
-  // ゾーン背景（下が低心拍・上が高心拍）
+  // ゾーン矩形（左が低心拍・右が高心拍）
   ZONES.forEach(zone => {
-    const yTop = BAR_TOP + BAR_HEIGHT * (1 - zone.max);
-    const h    = BAR_HEIGHT * (zone.max - zone.min);
+    const x = H_BAR_X + H_BAR_W * zone.min;
+    const w = H_BAR_W * (zone.max - zone.min);
     const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-    rect.setAttribute('x', BAR_LEFT);
-    rect.setAttribute('y', yTop);
-    rect.setAttribute('width', BAR_W);
-    rect.setAttribute('height', Math.max(1, h));
-    rect.setAttribute('rx', '3');
+    rect.setAttribute('x', x);
+    rect.setAttribute('y', H_BAR_Y);
+    rect.setAttribute('width', Math.max(1, w));
+    rect.setAttribute('height', H_BAR_H);
     rect.setAttribute('fill', zone.color);
-    rect.setAttribute('opacity', '0.5');
+    rect.setAttribute('opacity', '0.55');
     rect.setAttribute('id', 'zone-bar-' + zone.label);
     gZones.appendChild(rect);
   });
 
-  // 境界目盛り線＋BPMラベル（年齢連動）
-  const LX = BAR_LEFT + BAR_W + 4; // ラベルのx位置
+  // BPMラベル + 境界縦線（年齢連動）
   [0.50, 0.60, 0.70, 0.85, 1.00].forEach(t => {
-    const y   = BAR_TOP + BAR_HEIGHT * (1 - t);
+    const x   = H_BAR_X + H_BAR_W * t;
     const bpm = Math.round(maxHR * t);
+    const anchor = t === 1.00 ? 'end' : 'middle';
 
-    if (t < 1.00) {
+    // 境界縦線（端以外）
+    if (t > 0 && t < 1.00) {
       const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-      line.setAttribute('x1', BAR_LEFT - 3);
-      line.setAttribute('y1', y);
-      line.setAttribute('x2', BAR_LEFT + BAR_W + 3);
-      line.setAttribute('y2', y);
-      line.setAttribute('stroke', '#3a3a3a');
-      line.setAttribute('stroke-width', '1');
+      line.setAttribute('x1', x); line.setAttribute('y1', H_BAR_Y);
+      line.setAttribute('x2', x); line.setAttribute('y2', H_BAR_Y + H_BAR_H);
+      line.setAttribute('stroke', '#111');
+      line.setAttribute('stroke-width', '2');
       gTicks.appendChild(line);
     }
 
-    // BPM値ラベル
+    // BPMラベル（バー上部）
     const txt = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-    txt.setAttribute('x', LX);
-    txt.setAttribute('y', y + 4);
-    txt.setAttribute('font-size', '10');
-    txt.setAttribute('fill', '#555');
+    txt.setAttribute('x', x);
+    txt.setAttribute('y', H_BAR_Y - 5);
+    txt.setAttribute('text-anchor', anchor);
+    txt.setAttribute('font-size', '14');
+    txt.setAttribute('font-weight', '600');
+    txt.setAttribute('fill', '#888');
     txt.setAttribute('font-family', "'Helvetica Neue',Arial,sans-serif");
     txt.setAttribute('font-variant-numeric', 'tabular-nums');
     txt.textContent = bpm;
@@ -588,12 +593,14 @@ function buildHRBar(maxHR) {
 
 function updateHRBar(hr, maxHR) {
   const ratio = Math.min(1, Math.max(0, hr / maxHR));
-  const y = BAR_TOP + BAR_HEIGHT * (1 - ratio);
+  const x     = H_BAR_X + H_BAR_W * ratio;
 
-  const indicator = document.getElementById('hr-indicator');
-  indicator.setAttribute('y', y - 2);
-  indicator.setAttribute('opacity', '1');
+  // ポインター（縦線＋三角形）を移動
+  const pg = document.getElementById('hr-pointer-group');
+  pg.setAttribute('opacity', '1');
+  pg.setAttribute('transform', `translate(${x}, 0)`);
 
+  // ゾーンハイライト
   let currentZone = ZONES[0];
   ZONES.forEach(zone => {
     const el = document.getElementById('zone-bar-' + zone.label);
@@ -601,7 +608,7 @@ function updateHRBar(hr, maxHR) {
       currentZone = zone;
       if (el) el.setAttribute('opacity', '1');
     } else {
-      if (el) el.setAttribute('opacity', '0.25');
+      if (el) el.setAttribute('opacity', '0.2');
     }
   });
 
