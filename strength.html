@@ -74,6 +74,13 @@
     padding: 16px;
     gap: 12px;
   }
+  /* video mode */
+  #bench-video {
+    width: 100%;
+    max-width: 480px;
+    height: auto;
+    display: none;
+  }
   #bench-svg {
     width: 100%;
     max-width: 480px;
@@ -341,6 +348,11 @@
 <main>
   <!-- Bench Press Animation Panel -->
   <div class="bench-panel">
+    <!-- Video mode: shown when bench.webm is available -->
+    <video id="bench-video" muted playsinline preload="auto">
+      <source src="bench.webm" type="video/webm">
+    </video>
+    <!-- SVG fallback: shown when no video -->
     <svg id="bench-svg" viewBox="0 0 480 300" xmlns="http://www.w3.org/2000/svg">
       <defs>
         <filter id="bar-glow" x="-20%" y="-100%" width="140%" height="300%">
@@ -473,6 +485,7 @@ function playTone(freq, dur, vol = 0.4) {
 
 // ===== BENCH PRESS ANIMATION =====
 let _benchAnimId = null;
+let _useVideo = false;  // true when bench.webm loaded successfully
 
 function easeInOut(t) {
   return 0.5 - 0.5 * Math.cos(t * Math.PI);
@@ -489,12 +502,22 @@ function updateBenchPose(barbellY) {
 }
 
 function triggerRepAnim() {
+  if (_useVideo) {
+    // --- Video mode ---
+    const video = document.getElementById('bench-video');
+    if (video.duration) {
+      video.playbackRate = video.duration / (60 / TEMPO);
+    }
+    video.currentTime = 0;
+    video.play().catch(() => {});
+    return;
+  }
+  // --- SVG fallback mode ---
   if (_benchAnimId) cancelAnimationFrame(_benchAnimId);
   const beatMs = 60000 / TEMPO;
   const startTime = performance.now();
   function frame(now) {
     const t = Math.min((now - startTime) / beatMs, 1);
-    // 0→0.4: lower bar, 0.4→0.6: hold at bottom, 0.6→1.0: press up
     let p;
     if (t < 0.4)      p = easeInOut(t / 0.4);
     else if (t < 0.6) p = 1;
@@ -737,6 +760,18 @@ function updateClock() {
 
 // ===== INIT =====
 function init() {
+  // Video availability check
+  const video = document.getElementById('bench-video');
+  video.addEventListener('loadedmetadata', () => {
+    _useVideo = true;
+    document.getElementById('bench-svg').style.display = 'none';
+    video.style.display = 'block';
+  });
+  video.addEventListener('error', () => {
+    // bench.webm not found — stay with SVG
+    _useVideo = false;
+  });
+
   buildMiniSetDots();
   updateBenchPose(BB_Y_UP);
   updateDisplay();
