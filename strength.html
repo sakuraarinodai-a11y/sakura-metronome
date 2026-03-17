@@ -81,17 +81,16 @@
     0%   { transform: scale(1.5); opacity: 0; }
     100% { transform: scale(1);   opacity: 1; }
   }
-  /* 動画ラッパー：上30%をクロップ */
+  /* 動画ラッパー */
   .video-wrapper {
     width: 100%;
     max-width: 520px;
-    overflow: hidden;
-    border-radius: 12px;
   }
   #bench-video {
     width: 100%;
     display: block;
-    margin-top: -22.5%;  /* 上40%を隠す (40% × 9/16 = 22.5%) */
+    /* 上40%クロップ＋角丸を clip-path で一括処理 */
+    clip-path: inset(22.5% 0 0 0 round 12px);
     mix-blend-mode: screen;
   }
 
@@ -187,14 +186,17 @@
 
   /* ===== FOOTER ===== */
   footer {
-    display: flex; flex-direction: column; gap: 8px;
+    display: flex; align-items: center; justify-content: flex-end;
     padding: 10px 24px 12px;
     border-top: 1px solid #1a1a1a; background: #0d0d0d;
   }
-  .footer-row { display: flex; align-items: center; gap: 12px; width: 100%; }
-  .footer-spacer { flex: 1; }
 
-  /* Interval slider */
+  /* Interval row (strength-panel内) */
+  .interval-row {
+    display: flex; align-items: center; gap: 12px;
+    width: 100%; max-width: 460px;
+    padding: 4px 0;
+  }
   .interval-label { font-size: 14px; color: #666; white-space: nowrap; min-width: 80px; }
   #slider-interval {
     flex: 1; -webkit-appearance: none; appearance: none;
@@ -409,19 +411,19 @@
       <div id="main-denom"></div>
       <div id="set-info">1セット目</div>
     </div>
+
+    <!-- インターバル設定（赤枠の下） -->
+    <div class="interval-row">
+      <span class="interval-label">インターバル</span>
+      <input type="range" id="slider-interval" min="30" max="180" step="5" value="60">
+      <span id="interval-val">60秒</span>
+    </div>
   </div>
 </main>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-row">
-    <span class="interval-label">インターバル</span>
-    <input type="range" id="slider-interval" min="30" max="180" step="5" value="60">
-    <span id="interval-val">60秒</span>
-  </div>
-  <div class="footer-row">
-    <button id="btn-start">開始</button>
-  </div>
+  <button id="btn-start">開始</button>
 </footer>
 
 <script>
