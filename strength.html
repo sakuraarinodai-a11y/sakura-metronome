@@ -81,18 +81,19 @@
     0%   { transform: scale(1.5); opacity: 0; }
     100% { transform: scale(1);   opacity: 1; }
   }
-  /* 動画ラッパー：上40%クロップ */
+  /* 動画ラッパー：上40%・下20%クロップ（中間40%を表示） */
   .video-wrapper {
     width: 100%;
     max-width: 520px;
+    aspect-ratio: 40 / 9;  /* W × 9/40 = 22.5%W → 16:9動画の40%分の高さ */
     overflow: hidden;
     border-radius: 12px;
-    isolation: isolate;   /* mix-blend-mode要素もoverflow:hiddenで正しくクリップ */
+    isolation: isolate;
   }
   #bench-video {
     width: 100%;
     display: block;
-    margin-top: -22.5%;   /* 上40%を隠す (40% × 9/16 = 22.5%) */
+    margin-top: -22.5%;   /* 上40%を押し上げ (40% × 9/16 = 22.5%) */
     mix-blend-mode: screen;
   }
 
