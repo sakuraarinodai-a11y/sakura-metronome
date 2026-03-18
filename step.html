@@ -173,6 +173,44 @@
     text-transform: uppercase;
   }
 
+  /* ===== メンタルトレーナーメッセージ ===== */
+  #mentor-message {
+    font-size: 20px;
+    font-weight: 700;
+    color: #e8c4b8;
+    text-align: center;
+    min-height: 56px;
+    line-height: 1.4;
+    padding: 0 16px;
+    opacity: 0;
+    transition: opacity 0.6s ease;
+  }
+  #mentor-message.visible { opacity: 1; }
+
+  /* ===== 3カウントオーバーレイ ===== */
+  #countdown-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 200;
+  }
+  #countdown-overlay.hidden { display: none; }
+  #countdown-number {
+    font-size: 220px;
+    font-weight: 900;
+    color: #e8c4b8;
+    letter-spacing: -8px;
+    animation: cdPulse 0.85s ease-out;
+  }
+  @keyframes cdPulse {
+    0%   { transform: scale(1.6); opacity: 0; }
+    40%  { transform: scale(1.0); opacity: 1; }
+    100% { transform: scale(0.92); opacity: 0.85; }
+  }
+
   /* Beat dots */
   .beat-dots {
     display: flex;
@@ -769,6 +807,9 @@
       </div>
       <div id="preset-name">プリセットを選択してください</div>
 
+      <!-- メンタルトレーナーメッセージ -->
+      <div id="mentor-message"></div>
+
       <div class="bpm-display-wrap">
         <div id="bpm-value">--</div>
         <div id="bpm-label">BPM</div>
@@ -930,6 +971,70 @@ const S = {
   intervalPhaseDurationSec: 180,
   intervalTotalDurationSec: 900,
 };
+
+// ===== MENTOR MESSAGES =====
+const MENTOR_MSGS = {
+  fast: [
+    '心拍を上げろ！トレーニングゾーンへ飛び込め！',
+    '腕を振れ！ペースを上げていくぞ！',
+    'もっと踏み込め！心拍を押し上げろ！',
+    '全力で前へ！限界を超えていけ！',
+    '心拍をトレーニングゾーンへ！今が勝負だ！',
+  ],
+  slow: [
+    '次は有酸素運動フェーズ。深呼吸して心拍を整えろ。',
+    'リカバリータイム。有酸素ゾーンをキープしろ。',
+    'ゆっくり歩け。有酸素運動で脂肪を燃やすぞ。',
+    '心拍を落ち着けろ。次のスパートに備えろ。',
+    '有酸素運動フェーズ。呼吸を整えて体をリセットだ。',
+  ],
+};
+
+function showMentorMessage(type) {
+  const msgs = MENTOR_MSGS[type];
+  const msg  = msgs[Math.floor(Math.random() * msgs.length)];
+  const el   = document.getElementById('mentor-message');
+  el.textContent = msg;
+  el.classList.remove('visible');
+  void el.offsetWidth; // リフロー強制
+  el.classList.add('visible');
+  clearTimeout(el._hideTimer);
+  el._hideTimer = setTimeout(() => el.classList.remove('visible'), 4500);
+}
+
+function hideMentorMessage() {
+  const el = document.getElementById('mentor-message');
+  el.classList.remove('visible');
+  el.textContent = '';
+}
+
+// ===== COUNTDOWN =====
+function startCountdown(callback) {
+  const overlay = document.getElementById('countdown-overlay');
+  const numEl   = document.getElementById('countdown-number');
+  overlay.classList.remove('hidden');
+  let count = 3;
+
+  function showCount() {
+    numEl.textContent = count;
+    // アニメーション再起動
+    numEl.style.animation = 'none';
+    void numEl.offsetWidth;
+    numEl.style.animation = '';
+
+    if (count === 0) {
+      numEl.textContent = 'GO!';
+      setTimeout(() => {
+        overlay.classList.add('hidden');
+        callback();
+      }, 700);
+    } else {
+      count--;
+      setTimeout(showCount, 900);
+    }
+  }
+  showCount();
+}
 
 // ===== UTILS =====
 function formatMMSS(totalSec) {
@@ -1327,17 +1432,19 @@ function nextIntervalPhase() {
   S.bpm = preset.phases[S.intervalPhase].bpm;
   S.intervalPhaseStartTime = Date.now();
 
-  // フェーズ切り替え音
+  // フェーズ切り替え音 ＋ メンタルトレーナーメッセージ
   if (S.intervalPhase === 0) {
     // ゆっくり→早歩き：上昇音
     playTone(880, 0.12, 0.5);
     setTimeout(() => playTone(1100, 0.12, 0.5), 140);
     setTimeout(() => playTone(1320, 0.18, 0.5), 280);
+    showMentorMessage('fast');
   } else {
     // 早歩き→ゆっくり：下降音
     playTone(1100, 0.12, 0.4);
     setTimeout(() => playTone(880, 0.12, 0.4), 140);
     setTimeout(() => playTone(660, 0.18, 0.4), 280);
+    showMentorMessage('slow');
   }
   updateIntervalDisplay();
 }
@@ -1348,7 +1455,8 @@ function updateIntervalDisplay() {
   const emoji  = S.intervalPhase === 0 ? '🏃' : '🚶';
   document.getElementById('preset-name').textContent = `${emoji} ${phase.label} — セット ${S.intervalSet + 1}`;
   document.getElementById('preset-name').style.color = phase.color;
-  document.getElementById('bpm-value').textContent   = S.bpm;
+  // インターバル速歩中はBPM表示を非表示
+  document.querySelector('.bpm-display-wrap').style.display = 'none';
   document.getElementById('interval-set-label').textContent = `セット ${S.intervalSet + 1}`;
   document.getElementById('progress-bar-fill').style.background = phase.color;
 }
@@ -1368,29 +1476,31 @@ function startMetronome() {
   const preset = PRESETS[S.selectedPreset];
 
   if (preset.type === 'interval') {
-    startIntervalMode();
+    startCountdown(() => startIntervalMode());
     return;
   }
 
-  // ramp mode
-  S.bpm = preset.start;
-  S.beatInLevel = 0;
-  S.totalBeats = 0;
-  S.totalKcal = 0;
-  S.lastHRTime = 0;
-  S.running = true;
-  S.nextBeatTime = Date.now();
-  updateCaloriesDisplay();
+  // ramp mode — 3カウント後に開始
+  startCountdown(() => {
+    S.bpm = preset.start;
+    S.beatInLevel = 0;
+    S.totalBeats = 0;
+    S.totalKcal = 0;
+    S.lastHRTime = 0;
+    S.running = true;
+    S.nextBeatTime = Date.now();
+    updateCaloriesDisplay();
 
-  document.getElementById('ramp-settings').classList.add('hidden');
-  document.getElementById('bpm-value').textContent = S.bpm;
-  document.getElementById('prog-start').textContent = preset.start;
-  document.getElementById('prog-end').textContent = preset.end;
-  document.getElementById('btn-start').textContent = '停止';
-  document.getElementById('btn-start').classList.add('stop');
-  updateBeatDots(0);
-  updateProgress();
-  tick();
+    document.getElementById('ramp-settings').classList.add('hidden');
+    document.getElementById('bpm-value').textContent = S.bpm;
+    document.getElementById('prog-start').textContent = preset.start;
+    document.getElementById('prog-end').textContent = preset.end;
+    document.getElementById('btn-start').textContent = '停止';
+    document.getElementById('btn-start').classList.add('stop');
+    updateBeatDots(0);
+    updateProgress();
+    tick();
+  });
 }
 
 function startIntervalMode() {
@@ -1415,8 +1525,11 @@ function startIntervalMode() {
   document.getElementById('btn-start').textContent = '停止';
   document.getElementById('btn-start').classList.add('stop');
   document.getElementById('progress-bar-fill').style.width = '0%';
+  hideMentorMessage();
   updateBeatDots(0);
   updateIntervalDisplay();
+  // 最初のフェーズ（早歩き）のメッセージ
+  showMentorMessage('fast');
   tickInterval();
 }
 
@@ -1446,6 +1559,7 @@ function stopMetronome(completed) {
       updateBeatDots(0);
       updateProgress();
     } else if (preset.type === 'interval') {
+      document.querySelector('.bpm-display-wrap').style.display = '';
       document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
       document.getElementById('preset-name').textContent = preset.name;
       document.getElementById('preset-name').style.color = '#aaa';
@@ -1453,6 +1567,7 @@ function stopMetronome(completed) {
       document.getElementById('interval-settings').classList.remove('hidden');
       document.getElementById('progress-bar-fill').style.width = '0%';
       document.getElementById('progress-bar-fill').style.background = preset.phases[0].color;
+      hideMentorMessage();
       updateBeatDots(0);
     }
   } else {
@@ -1679,5 +1794,10 @@ function init() {
 
 document.addEventListener('DOMContentLoaded', init);
 </script>
+
+<!-- 3カウントオーバーレイ -->
+<div id="countdown-overlay" class="hidden">
+  <div id="countdown-number">3</div>
+</div>
 </body>
 </html>
