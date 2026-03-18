@@ -1559,8 +1559,7 @@ function stopMetronome(completed) {
       updateBeatDots(0);
       updateProgress();
     } else if (preset.type === 'interval') {
-      document.querySelector('.bpm-display-wrap').style.display = '';
-      document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
+      document.querySelector('.bpm-display-wrap').style.display = 'none';
       document.getElementById('preset-name').textContent = preset.name;
       document.getElementById('preset-name').style.color = '#aaa';
       document.getElementById('interval-live').classList.add('hidden');
@@ -1725,6 +1724,7 @@ function init() {
       });
 
       if (preset.type === 'ramp') {
+        document.querySelector('.bpm-display-wrap').style.display = '';
         document.getElementById('preset-name').textContent = preset.name;
         document.getElementById('bpm-value').textContent = preset.start;
         document.getElementById('prog-start').textContent = preset.start;
@@ -1737,8 +1737,8 @@ function init() {
         document.getElementById('interval-live').classList.add('hidden');
         document.getElementById('kcal-big-wrap').classList.remove('visible');
       } else if (preset.type === 'interval') {
+        document.querySelector('.bpm-display-wrap').style.display = 'none';
         document.getElementById('preset-name').textContent = preset.name;
-        document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
         document.getElementById('ramp-settings').classList.add('hidden');
         document.getElementById('interval-settings').classList.remove('hidden');
         document.getElementById('interval-live').classList.add('hidden');
@@ -1768,12 +1768,13 @@ function init() {
     hideDoneScreen();
     const preset = PRESETS[S.selectedPreset];
     if (preset.type === 'ramp') {
+      document.querySelector('.bpm-display-wrap').style.display = '';
       document.getElementById('bpm-value').textContent = preset.start;
       document.getElementById('ramp-settings').classList.remove('hidden');
       updateBeatDots(0);
       updateProgress();
     } else if (preset.type === 'interval') {
-      document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
+      document.querySelector('.bpm-display-wrap').style.display = 'none';
       document.getElementById('preset-name').textContent = preset.name;
       document.getElementById('preset-name').style.color = '#aaa';
       document.getElementById('interval-settings').classList.remove('hidden');
