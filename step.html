@@ -570,11 +570,10 @@
       gap: 6px 8px;
       padding: 8px 12px;
     }
-    #btn-preset-0 { grid-column: 1; grid-row: 1; padding: 9px 4px; font-size: 12px; }
-    #btn-preset-1 { grid-column: 2; grid-row: 1; padding: 9px 4px; font-size: 12px; }
+    #btn-preset-0 { grid-column: 1 / span 2; grid-row: 1; padding: 9px 8px; font-size: 13px; }
     #btn-bt       { grid-column: 3; grid-row: 1; padding: 9px 10px; font-size: 13px; }
     #btn-start    { grid-column: 4; grid-row: 1; padding: 9px 16px; font-size: 15px; }
-    #btn-preset-2 { grid-column: 1 / -1; grid-row: 2; font-size: 13px; padding: 9px 8px; }
+    #btn-preset-1 { grid-column: 1 / -1; grid-row: 2; font-size: 13px; padding: 9px 8px; }
     .footer-spacer { display: none; }
     .age-ctrl {
       grid-column: 1 / -1;
@@ -822,9 +821,8 @@
 
 <!-- FOOTER -->
 <footer>
-  <button class="footer-btn" id="btn-preset-0">ウォーキング1</button>
-  <button class="footer-btn" id="btn-preset-1">ウォーキング2</button>
-  <button class="footer-btn" id="btn-preset-2">インターバル速歩</button>
+  <button class="footer-btn" id="btn-preset-0">リハビリステップ</button>
+  <button class="footer-btn" id="btn-preset-1">インターバル速歩</button>
   <div class="footer-spacer"></div>
   <!-- 年齢・性別・体重コントロール -->
   <div class="age-ctrl">
@@ -870,8 +868,7 @@ const ZONES = [
 ];
 
 const PRESETS = [
-  { name: 'ウォーキング1', type: 'ramp', start: 75, end: 105 },
-  { name: 'ウォーキング2', type: 'ramp', start: 85, end: 115 },
+  { name: 'リハビリステップ', type: 'ramp', start: 75, end: 105 },
   {
     name: 'インターバル速歩',
     type: 'interval',
