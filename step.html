@@ -225,6 +225,16 @@
     width: 0%;
   }
 
+  /* ===== RAMP SETTINGS ===== */
+  #ramp-settings {
+    width: 100%;
+    max-width: 440px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  #ramp-settings.hidden { display: none; }
+
   /* ===== INTERVAL SETTINGS ===== */
   #interval-settings {
     width: 100%;
@@ -766,6 +776,18 @@
 
       <div class="beat-dots" id="beat-dots"></div>
 
+      <!-- リハビリステップ設定（未開始時のみ表示） -->
+      <div id="ramp-settings" class="hidden">
+        <div class="iset-row">
+          <span class="iset-label">スタート BPM</span>
+          <div class="iset-ctrl">
+            <input type="range" id="ramp-start-slider" min="40" max="100" step="1" value="75"
+                   oninput="onRampStart(this.value)">
+            <span id="ramp-start-disp" style="font-size:17px;font-weight:700;color:#fff;min-width:38px;text-align:right;font-variant-numeric:tabular-nums">75</span>
+          </div>
+        </div>
+      </div>
+
       <!-- インターバル設定（未開始時のみ表示） -->
       <div id="interval-settings" class="hidden">
         <div class="iset-row">
@@ -951,6 +973,17 @@ function onAge(v) {
   buildHRBar(S.maxHR);
   if (S.hr > 0) updateHRBar(S.hr, S.maxHR);
   try { localStorage.setItem('sakura_step_age', S.age); } catch (_) {}
+}
+
+// ===== RAMP START BPM =====
+function onRampStart(v) {
+  const val = parseInt(v);
+  PRESETS[0].start = val;
+  document.getElementById('ramp-start-disp').textContent = val;
+  document.getElementById('bpm-value').textContent = val;
+  document.getElementById('prog-start').textContent = val;
+  document.getElementById('prog-current').textContent = val + ' BPM';
+  try { localStorage.setItem('sakura_ramp_start', val); } catch (_) {}
 }
 
 // ===== SEX / WEIGHT =====
@@ -1349,6 +1382,7 @@ function startMetronome() {
   S.nextBeatTime = Date.now();
   updateCaloriesDisplay();
 
+  document.getElementById('ramp-settings').classList.add('hidden');
   document.getElementById('bpm-value').textContent = S.bpm;
   document.getElementById('prog-start').textContent = preset.start;
   document.getElementById('prog-end').textContent = preset.end;
@@ -1408,6 +1442,7 @@ function stopMetronome(completed) {
   if (preset) {
     if (preset.type === 'ramp') {
       document.getElementById('bpm-value').textContent = preset.start;
+      document.getElementById('ramp-settings').classList.remove('hidden');
       updateBeatDots(0);
       updateProgress();
     } else if (preset.type === 'interval') {
@@ -1535,6 +1570,13 @@ function init() {
   document.getElementById('btn-sex-male').addEventListener('click', () => setSex('male'));
   document.getElementById('btn-sex-female').addEventListener('click', () => setSex('female'));
 
+  // リハビリスタートBPMをLocalStorageから復元
+  let initRampStart = 75;
+  try { const s = localStorage.getItem('sakura_ramp_start'); if (s) initRampStart = parseInt(s); } catch (_) {}
+  PRESETS[0].start = initRampStart;
+  document.getElementById('ramp-start-slider').value = initRampStart;
+  document.getElementById('ramp-start-disp').textContent = initRampStart;
+
   buildBeatDots();
   updateClock();
   setInterval(updateClock, 1000);
@@ -1574,12 +1616,14 @@ function init() {
         document.getElementById('prog-end').textContent = preset.end;
         document.getElementById('progress-bar-fill').style.width = '0%';
         document.getElementById('progress-bar-fill').style.background = 'linear-gradient(90deg, #0284C7, #22C55E, #EAB308)';
+        document.getElementById('ramp-settings').classList.remove('hidden');
         document.getElementById('interval-settings').classList.add('hidden');
         document.getElementById('interval-live').classList.add('hidden');
         document.getElementById('kcal-big-wrap').classList.remove('visible');
       } else if (preset.type === 'interval') {
         document.getElementById('preset-name').textContent = preset.name;
         document.getElementById('bpm-value').textContent = preset.phases[0].bpm;
+        document.getElementById('ramp-settings').classList.add('hidden');
         document.getElementById('interval-settings').classList.remove('hidden');
         document.getElementById('interval-live').classList.add('hidden');
         document.getElementById('prog-start').textContent = '残り';
@@ -1609,6 +1653,7 @@ function init() {
     const preset = PRESETS[S.selectedPreset];
     if (preset.type === 'ramp') {
       document.getElementById('bpm-value').textContent = preset.start;
+      document.getElementById('ramp-settings').classList.remove('hidden');
       updateBeatDots(0);
       updateProgress();
     } else if (preset.type === 'interval') {
