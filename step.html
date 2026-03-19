@@ -88,6 +88,21 @@
     min-height: 0;
   }
 
+  /* ===== BPM BAR ===== */
+  .bpm-bar-area {
+    flex-shrink: 0;
+    padding: 6px 0 4px;
+    border-top: 1px solid #1a1a1a;
+  }
+  .bpm-bar-title {
+    font-size: 10px;
+    color: #444;
+    letter-spacing: 0.1em;
+    margin-bottom: 3px;
+    font-weight: 600;
+  }
+  #bpm-bar-svg { display: block; width: 100%; }
+
   /* HR horizontal bar area (bottom) */
   .hr-bar-h-area {
     flex-shrink: 0;
@@ -767,6 +782,42 @@
       </svg>
     </div>
 
+    <!-- BPM bar -->
+    <div class="bpm-bar-area">
+      <div class="bpm-bar-title">BPM</div>
+      <svg id="bpm-bar-svg" viewBox="0 0 400 46" preserveAspectRatio="xMidYMid meet">
+        <defs>
+          <linearGradient id="bpm-grad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%"   stop-color="#0284C7"/>
+            <stop offset="35%"  stop-color="#16A34A"/>
+            <stop offset="65%"  stop-color="#EAB308"/>
+            <stop offset="82%"  stop-color="#EA580C"/>
+            <stop offset="100%" stop-color="#DC2626"/>
+          </linearGradient>
+        </defs>
+        <!-- バー背景 -->
+        <rect x="0" y="18" width="400" height="16" rx="3" fill="#1a1a1a"/>
+        <!-- グラデーションバー（薄め） -->
+        <rect x="0" y="18" width="400" height="16" rx="3" fill="url(#bpm-grad)" opacity="0.3"/>
+        <!-- BPMラベル -->
+        <text x="0"   y="14" font-size="9" fill="#444" font-family="monospace" font-weight="600">40</text>
+        <text x="150" y="14" font-size="9" fill="#444" font-family="monospace" font-weight="600" text-anchor="middle">75</text>
+        <text x="267" y="14" font-size="9" fill="#444" font-family="monospace" font-weight="600" text-anchor="middle">105</text>
+        <text x="400" y="14" font-size="9" fill="#444" font-family="monospace" font-weight="600" text-anchor="end">160</text>
+        <!-- 境界縦線 -->
+        <line x1="150" y1="18" x2="150" y2="34" stroke="#2a2a2a" stroke-width="1.5"/>
+        <line x1="267" y1="18" x2="267" y2="34" stroke="#2a2a2a" stroke-width="1.5"/>
+        <!-- ポインター -->
+        <g id="bpm-bar-pointer" opacity="0">
+          <line x1="0" y1="14" x2="0" y2="36" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <polygon points="-5,36 5,36 0,44" fill="white"/>
+          <rect id="bpm-bar-ptr-bg" x="-18" y="2" width="36" height="12" rx="2" fill="#111" opacity="0.88"/>
+          <text id="bpm-bar-ptr-val" x="0" y="12" text-anchor="middle" font-size="10" font-weight="900"
+                fill="white" font-family="monospace" font-variant-numeric="tabular-nums">--</text>
+        </g>
+      </svg>
+    </div>
+
     <!-- HR horizontal bar (bottom) -->
     <div class="hr-bar-h-area">
       <div class="hr-h-info">
@@ -1338,6 +1389,25 @@ function updateProgress() {
   document.getElementById('prog-end').textContent = preset.end;
 }
 
+// ===== BPM BAR =====
+const BPM_BAR_MIN = 40;
+const BPM_BAR_MAX = 160;
+const BPM_BAR_W   = 400;
+
+function updateBPMBar(bpm) {
+  const pointer = document.getElementById('bpm-bar-pointer');
+  if (!pointer) return;
+  if (!bpm || bpm <= 0) {
+    pointer.setAttribute('opacity', '0');
+    return;
+  }
+  const ratio = Math.max(0, Math.min(1, (bpm - BPM_BAR_MIN) / (BPM_BAR_MAX - BPM_BAR_MIN)));
+  const x     = ratio * BPM_BAR_W;
+  pointer.setAttribute('opacity', '1');
+  pointer.setAttribute('transform', `translate(${x}, 0)`);
+  document.getElementById('bpm-bar-ptr-val').textContent = bpm;
+}
+
 // ===== RAMP MODE ENGINE =====
 function onBeat() {
   S.beatInLevel++;
@@ -1362,6 +1432,7 @@ function onBeat() {
     flashBPM();
     document.getElementById('bpm-value').textContent = S.bpm;
     updateProgress();
+    updateBPMBar(S.bpm);
     updateBeatDots(1);
   } else {
     if (isAccent) {
@@ -1451,6 +1522,7 @@ function nextIntervalPhase() {
     showMentorMessage('slow');
   }
   updateIntervalDisplay();
+  updateBPMBar(S.bpm);
 }
 
 function updateIntervalDisplay() {
@@ -1503,6 +1575,7 @@ function startMetronome() {
     document.getElementById('btn-start').classList.add('stop');
     updateBeatDots(0);
     updateProgress();
+    updateBPMBar(S.bpm);
     tick();
   });
 }
@@ -1532,6 +1605,7 @@ function startIntervalMode() {
   hideMentorMessage();
   updateBeatDots(0);
   updateIntervalDisplay();
+  updateBPMBar(S.bpm);
   // 最初のフェーズ（早歩き）のメッセージ
   showMentorMessage('fast');
   tickInterval();
@@ -1555,6 +1629,7 @@ function stopMetronome(completed) {
 
   document.getElementById('btn-start').textContent = '開始';
   document.getElementById('btn-start').classList.remove('stop');
+  updateBPMBar(0);
 
   if (preset) {
     if (preset.type === 'ramp') {
