@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <rect width="192" height="192" rx="40" fill="#080808"/>
+  <!-- 桜ピンクの三角（メトロノーム） -->
+  <polygon points="96,28 148,152 44,152" fill="none" stroke="#e8c4b8" stroke-width="10" stroke-linejoin="round"/>
+  <!-- 振り子針 -->
+  <line x1="96" y1="152" x2="128" y2="72" stroke="#e8c4b8" stroke-width="6" stroke-linecap="round"/>
+  <!-- 支点ドット -->
+  <circle cx="96" cy="152" r="8" fill="#e8c4b8"/>
+</svg>

@@ -3,6 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="apple-touch-icon" href="/icon.svg">
   <title>サクラ整骨院 メトロノーム</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,5 +52,10 @@
       <div class="card-desc">低重量トレーニング<br>33 BPM / 13回×4セット</div>
     </a>
   </div>
+<script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  }
+</script>
 </body>
 </html>
